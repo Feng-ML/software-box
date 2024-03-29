@@ -20,7 +20,7 @@ export const electronDevPlugin = (): Plugin => {
                 let electronProcess = spawn(electron as any, ['dist/background.js', IP])
 
                 // 监听到文件变化，重启electron
-                fs.watchFile('src/background.js', () => {
+                fs.watchFile('src/background.ts', () => {
                     electronProcess.kill()
                     buildBackground()
                     electronProcess = spawn(electron as any, ['dist/background.js', IP])
