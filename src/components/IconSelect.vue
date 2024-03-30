@@ -11,7 +11,7 @@
 </template>
 
 <script lang='ts' setup>
-import { iconNames } from '@/main.ts'
+import { iconNames } from '@/main'
 import { ref } from 'vue';
 
 const emit = defineEmits(['select'])
