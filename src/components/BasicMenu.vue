@@ -1,10 +1,10 @@
 <template>
-  <el-menu default-active="0" ref="elMenuRef" class="el-menu-vertical" :collapse="isCollapse">
+  <el-menu default-active="0" ref="elMenuRef" class="el-menu-vertical" :collapse="isCollapse" @select="selectMenu">
     <div class="menu-title">
-      <div>菜单</div>
+      <div>分类</div>
 
       <div v-if="!isEdit" class="menu-tool">
-        <el-icon @click="isEdit = !isEdit">
+        <el-icon @click="isEdit = !isEdit" title="设置">
           <Tools />
         </el-icon>
         <!-- <el-icon @click="isCollapse = !isCollapse">
@@ -12,95 +12,144 @@
         </el-icon> -->
       </div>
       <div v-else class="menu-tool">
-        <el-icon class="main-color" @click="openAddFormDialog">
+        <el-icon class="main-color" @click="openAddFormDialog()" title="添加">
           <CirclePlusFilled />
         </el-icon>
-        <el-icon class="success-color" @click="isEdit = !isEdit"><Select /></el-icon>
+        <el-icon class="success-color" @click="isEdit = !isEdit" title="完成"><Select /></el-icon>
       </div>
     </div>
 
 
-    <el-menu-item v-for="(item, index) in menuList" :key="item.name" :index="index + ''">
+    <el-menu-item v-for="(item, index) in list" :key="item.id" :index="index + ''">
       <el-icon>
         <component :is="item.icon" />
       </el-icon>
-      <template #title>{{ item.name }}</template>
+      <!-- <template #title>{{ item.name }}</template> -->
+      <div class="menu-item-name">{{ item.name }}</div>
 
-      <el-popconfirm title="确定删除吗?" @confirm.stop="deleteMenu(item)">
-        <template #reference>
-          <el-icon class="el-icon-delete" v-show="isEdit">
-            <RemoveFilled />
-          </el-icon>
-        </template>
-      </el-popconfirm>
+      <div class="menu-item-tool">
+        <el-icon class="el-icon-edit" v-show="isEdit" @click="openAddFormDialog(index)" title="编辑">
+          <Edit />
+        </el-icon>
+        <el-popconfirm title="确定删除吗?" @confirm.stop="deleteMenu(index)">
+          <template #reference>
+            <el-icon class="el-icon-delete" v-show="isEdit" title="删除">
+              <RemoveFilled />
+            </el-icon>
+          </template>
+        </el-popconfirm>
+      </div>
     </el-menu-item>
   </el-menu>
 
-  <BasicDialog v-model="dialogVisible" :form-config="formConfig" @submit="addFormConfirm"></BasicDialog>
+  <BasicDialog :title="formTitle" v-model="dialogVisible" :form-type="formType" :form-data="formData" width="400"
+    :form-config="formConfig" @submit="formSubmit" />
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { ElMessage } from 'element-plus'
 
 import BasicDialog from './BasicDialog.vue'
 import type { IFormConfigItem } from './BasicDialog.vue';
+import type { ICategoryItem } from "@/interfaces";
+import { generateRandomId } from '@/utils/common'
+
+const emit = defineEmits(['update:list', 'selectMenu'])
 
 const isCollapse = ref(false)
 const elMenuRef = ref()
 
-interface IMenuItem {
-  name: string,
-  icon: string,
-}
-const menuList: IMenuItem[] = reactive([{
-  name: 'Navigator One',
-  icon: 'Document',
-}, {
-  name: 'Navigator Two',
-  icon: 'Menu',
-}])
+const props = defineProps({
+  list: {
+    type: Array<ICategoryItem>,
+    default: () => [],
+  },
+})
 
+let formData: object
+let formType: string
+let formTitle: string
 let formConfig: IFormConfigItem[] = [
   {
-    label: '菜单名称',
+    label: '分类名称',
     prop: 'name',
     type: 'input',
-    rules: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }]
+    rules: [{ required: true, message: '请输入分类名称', trigger: 'blur' }],
+    attrs: {
+      maxlength: 10,
+      placeholder: '请输入分类名称',
+      showWordLimit: true
+    }
   },
   {
-    label: '菜单图标',
+    label: '分类图标',
     prop: 'icon',
     type: 'icon',
   },
 ]
 
-// 编辑菜单
-const isEdit = ref(false)
+const selectMenu = (index: string) => {
+  emit('selectMenu', index)
+}
 
-// 新增菜单
+// 打开编辑框
 const dialogVisible = ref(false)
-const openAddFormDialog = () => {
+const openAddFormDialog = (index?: number) => {
+  if (typeof index === 'number') {
+    formType = 'edit'
+    formData = toRaw(props.list[index])
+    formTitle = '编辑分类'
+  } else {
+    formType = 'add'
+    formData = {}
+    formTitle = '新增分类'
+  }
   dialogVisible.value = true
 }
+
+const formSubmit = (formData: object) => {
+  if (formType === 'edit') {
+    editMenu(formData)
+  } else {
+    addFormConfirm(formData)
+  }
+}
+
+// 编辑菜单
+const isEdit = ref(false)
+const editMenu = (data: any) => {
+  const menuList = [...props.list]
+  const inx = menuList.findIndex((item) => item.id === data.id)
+  if (inx > -1) {
+    menuList[inx] = data
+    emit('update:list', menuList)
+    dialogVisible.value = false
+  }
+}
+
+// 新增菜单
 const addFormConfirm = (data: any) => {
+  const menuList = [...props.list]
   const inx = menuList.findIndex((item) => item.name === data.name)
   if (inx >= 0) return ElMessage.error('已存在相同的名称，请重新输入！')
 
   menuList.push({
+    id: generateRandomId(20),
     name: data.name,
     icon: data.icon,
+    softwareList: []
   })
 
+  emit('update:list', menuList)
   dialogVisible.value = false
 }
 
 // 删除菜单
-const deleteMenu = (item: IMenuItem) => {
-  const inx = menuList.findIndex((i) => i.name === item.name)
-  if (inx > -1) {
-    menuList.splice(inx, 1)
-  }
+const deleteMenu = (index: number) => {
+  const menuList = [...props.list]
+  menuList.splice(index, 1)
+  emit('update:list', menuList)
 }
 
 </script>
@@ -128,10 +177,24 @@ const deleteMenu = (item: IMenuItem) => {
   min-height: 400px;
 }
 
-.el-icon-delete {
-  cursor: pointer;
-  color: var(--el-color-danger) !important;
-  position: absolute;
-  right: 10px;
+.menu-item-name {
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.menu-item-tool {
+  // position: absolute;
+  // right: 10px;
+
+  .el-icon-edit {
+    cursor: pointer;
+    color: var(--el-color-primary);
+  }
+
+  .el-icon-delete {
+    cursor: pointer;
+    color: var(--el-color-danger) !important;
+  }
 }
 </style>

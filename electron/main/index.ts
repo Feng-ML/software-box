@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron'
 import { release } from 'node:os'
 import { join, dirname, basename, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import ipcHandler from './ipc'
 
 globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
@@ -83,7 +84,10 @@ async function createWindow() {
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  ipcHandler()
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   win = null
@@ -123,28 +127,3 @@ ipcMain.handle('open-win', (_, arg) => {
     childWindow.loadFile(indexHtml, { hash: arg })
   }
 })
-
-async function handleFileOpen() {
-  const { canceled, filePaths } = await dialog.showOpenDialog({
-    title: '选择文件',
-    properties: ['openFile', 'multiSelections']
-  })
-
-  if (!canceled) {
-    const allPromises = []
-    for (let i = 0; i < filePaths.length; i++) {
-      allPromises.push(app.getFileIcon(filePaths[i]))
-    }
-    return Promise.all(allPromises).then(res => {
-      return res.map((item, index) => {
-        return {
-          path: filePaths[index],
-          name: basename(filePaths[index], extname(filePaths[index])),
-          icon: item.toDataURL()
-        }
-      })
-    })
-  }
-}
-
-ipcMain.handle('dialog:openFile', handleFileOpen)

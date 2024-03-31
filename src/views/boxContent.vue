@@ -1,8 +1,8 @@
 <template>
     <el-space wrap class="box-content">
-        <div v-for="i in cardList" :key="i.name" class="box-card" shadow="hover">
+        <div v-for="i in list" :key="i.name" class="box-card" shadow="hover">
             <el-tooltip class="box-item" effect="dark" :content="i.name" placement="top">
-                <el-image style="width: 100px; height: 100px" :src="i.icon" />
+                <el-image style="width: 80px; height: 80px" :src="i.icon" />
                 <!-- <div class="box-name">名称</div> -->
             </el-tooltip>
         </div>
@@ -17,38 +17,29 @@
 </template>
 
 <script lang='ts' setup>
-import defaultImg from '@/assets/images/Bartender.png';
-import { reactive, ref } from 'vue';
+import type { ISoftware } from "@/interfaces";
 
-const cardList = reactive([
-    {
-        name: 'Bartender4',
-        icon: defaultImg
-    }, {
-        name: 'Bartender2',
-        icon: defaultImg
-    }, {
-        name: 'Bartender3',
-        icon: defaultImg
-    }, {
-        name: 'Bartender4',
-        icon: defaultImg
-    }, {
-        name: 'Bartender2',
-        icon: defaultImg
-    }, {
-        name: 'Bartender3',
-        icon: defaultImg
-    }, {
-        name: 'Bartender4',
-        icon: defaultImg
+const emit = defineEmits(['update:list'])
+
+const props = defineProps({
+    list: {
+        type: Array<ISoftware>,
+        default: () => [],
+    },
+    active: {
+        type: Number,
+        default: 0
     }
-])
+})
 
 const addItem = async () => {
     window.ipcRenderer.invoke('dialog:openFile').then(file => {
         console.log(file);
-        if (file) cardList.push(...file)
+        if (file) {
+            const list = [...props.list]
+            list.push(...file)
+            emit('update:list', list)
+        }
     })
 }
 
@@ -63,8 +54,8 @@ const addItem = async () => {
     cursor: pointer;
     transition-duration: 0.3s;
     padding: 10px;
-    min-width: 100px;
-    min-height: 100px;
+    min-width: 80px;
+    min-height: 80px;
     text-align: center;
     display: flex;
     flex-direction: column;
