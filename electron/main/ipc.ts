@@ -17,6 +17,7 @@ async function handleFileOpen() {
         return Promise.all(allPromises).then(res => {
             return res.map((item, index) => {
                 return {
+                    id: new Date().valueOf().toString() + index,
                     path: filePaths[index],
                     name: basename(filePaths[index], extname(filePaths[index])),
                     icon: item.toDataURL()
@@ -31,8 +32,6 @@ export default function () {
 
     // 持久化存储数据
     ipcMain.on('set-category-list', (event, data) => {
-        console.log("设置成功", data);
-
         saveCategoryList(data)
     })
 

@@ -1,6 +1,5 @@
 <template>
-  <el-menu :default-active="activeIndex" ref="elMenuRef" class="el-menu-vertical" :collapse="isCollapse"
-    @select="selectMenu">
+  <el-menu :default-active="activeIndex" ref="elMenuRef" class="el-menu" :collapse="isCollapse" @select="selectMenu">
     <div class="menu-title">
       <div>分类</div>
 
@@ -156,25 +155,32 @@ const deleteMenu = (index: number) => {
 
 const activeIndex = ref('0')
 onMounted(() => {
-  Sortable.create(elMenuRef.value.$el, {
-    // group: 'menu',
-    animation: 250,
-    ghostClass: "sortable-ghost", //放置占位符的类名
-    chosenClass: "sortable-chosen", //所选项目的类名
+  setTimeout(() => {
+    Sortable.create(elMenuRef.value.$el, {
+      // group: 'menu',
+      animation: 250,
+      ghostClass: "sortable-ghost", //放置占位符的类名
+      chosenClass: "sortable-chosen", //所选项目的类名
+      forceFallback: true,
 
-    onEnd: ({ newIndex, oldIndex }: any) => {
-      const newInx = newIndex - 1
-      const oldInx = oldIndex - 1;
-      const menuList = [...props.list]
+      onEnd: (evt: any) => {
+        const newInx = evt.newDraggableIndex
+        const oldInx = evt.oldDraggableIndex
+        const menuList = [...props.list]
+        const oldItemId = menuList[Number(activeIndex.value)].id
 
-      // 交换位置
-      if (newIndex !== oldIndex) {
-        [menuList[newInx], menuList[oldInx]] = [menuList[oldInx], menuList[newInx]]
-        emit('update:list', menuList)
-        activeIndex.value = (newInx).toString()
-      }
-    },
-  })
+        if (newInx !== oldInx) {
+          // 交换位置
+          const old = menuList.splice(oldInx, 1)[0]
+          menuList.splice(newInx, 0, old)
+          // 更新激活项
+          const newItemIndex = menuList.findIndex((item) => item.id === oldItemId)
+          activeIndex.value = newItemIndex.toString()
+          emit('update:list', menuList)
+        }
+      },
+    })
+  }, 0);
 })
 </script>
 
@@ -196,7 +202,7 @@ onMounted(() => {
   }
 }
 
-.el-menu-vertical:not(.el-menu--collapse) {
+.el-menu:not(.el-menu--collapse) {
   width: 200px;
   min-height: 400px;
 }

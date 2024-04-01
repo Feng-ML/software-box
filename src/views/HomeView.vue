@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 import BasicMenu from "@/components/BasicMenu.vue"
 import BoxContent from "./boxContent.vue"
-import { ref, shallowRef, watchEffect } from "vue";
+import { nextTick, ref, shallowRef, watchEffect } from "vue";
 import type { ICategoryItem, ISoftware } from "@/interfaces";
 
 const categoryList = shallowRef<ICategoryItem[]>([]);
@@ -23,10 +23,12 @@ window.ipcRenderer.invoke("get-category-list").then((data: ICategoryItem[]) => {
 })
 
 const updateList = (list: ICategoryItem[]) => {
-  console.log(list);
+  categoryList.value = []
 
-  categoryList.value = list
-  window.ipcRenderer.send("set-category-list", list)
+  nextTick(() => {
+    categoryList.value = list
+    window.ipcRenderer.send("set-category-list", list)
+  })
 }
 
 // 软件列表
@@ -34,10 +36,12 @@ let activeIndex = 0
 const softwareList = shallowRef<ISoftware[]>([])
 const selectMenu = (index: string) => {
   activeIndex = Number(index)
-  softwareList.value = categoryList.value[Number(index)].softwareList
+  softwareList.value = categoryList.value[activeIndex].softwareList
 }
 
 const updateSoftwareList = (list: ISoftware[]) => {
+  console.log(list);
+
   softwareList.value = list
   categoryList.value[activeIndex].softwareList = list
   updateList(categoryList.value)
