@@ -1,5 +1,6 @@
 <template>
-  <el-menu default-active="0" ref="elMenuRef" class="el-menu-vertical" :collapse="isCollapse" @select="selectMenu">
+  <el-menu :default-active="activeIndex" ref="elMenuRef" class="el-menu-vertical" :collapse="isCollapse"
+    @select="selectMenu">
     <div class="menu-title">
       <div>分类</div>
 
@@ -47,8 +48,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRaw } from 'vue'
+import { onMounted, ref, toRaw } from 'vue'
 import { ElMessage } from 'element-plus'
+import Sortable from 'sortablejs';
 
 import BasicDialog from './BasicDialog.vue'
 import type { IFormConfigItem } from './BasicDialog.vue';
@@ -64,7 +66,7 @@ const props = defineProps({
   list: {
     type: Array<ICategoryItem>,
     default: () => [],
-  },
+  }
 })
 
 let formData: object
@@ -152,6 +154,28 @@ const deleteMenu = (index: number) => {
   emit('update:list', menuList)
 }
 
+const activeIndex = ref('0')
+onMounted(() => {
+  Sortable.create(elMenuRef.value.$el, {
+    // group: 'menu',
+    animation: 250,
+    ghostClass: "sortable-ghost", //放置占位符的类名
+    chosenClass: "sortable-chosen", //所选项目的类名
+
+    onEnd: ({ newIndex, oldIndex }: any) => {
+      const newInx = newIndex - 1
+      const oldInx = oldIndex - 1;
+      const menuList = [...props.list]
+
+      // 交换位置
+      if (newIndex !== oldIndex) {
+        [menuList[newInx], menuList[oldInx]] = [menuList[oldInx], menuList[newInx]]
+        emit('update:list', menuList)
+        activeIndex.value = (newInx).toString()
+      }
+    },
+  })
+})
 </script>
 
 <style scoped lang="scss">
@@ -196,5 +220,10 @@ const deleteMenu = (index: number) => {
     cursor: pointer;
     color: var(--el-color-danger) !important;
   }
+}
+
+.sortable-ghost {
+  border: 2px dashed var(--el-color-primary);
+  opacity: 0.5;
 }
 </style>
