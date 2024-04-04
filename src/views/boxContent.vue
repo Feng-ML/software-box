@@ -1,19 +1,28 @@
 <template>
     <div class="software-box" @drop="handleDrop" @dragover="handleDragOver">
         <div class="box-content" ref="boxContentRef">
-            <div v-for="i in list" :key="i.id" class="box-card" shadow="hover">
+            <div v-for="i in list" :key="i.id" class="box-card">
+                <el-popconfirm title="确定删除吗?" @confirm.stop="deleteItem(i.id)">
+                    <template #reference>
+                        <el-icon class="delete-btn" size="25">
+                            <RemoveFilled />
+                        </el-icon>
+                    </template>
+                </el-popconfirm>
                 <el-tooltip class="box-item" effect="dark" :content="i.name" placement="top">
                     <el-image style="width: 80px; height: 80px" :src="i.icon" />
                     <!-- <div class="box-name">名称</div> -->
                 </el-tooltip>
             </div>
         </div>
-        <div class="add-btn" @click="selectFile">
-            <el-button type="primary" circle>
-                <el-icon>
-                    <Plus />
-                </el-icon>
-            </el-button>
+        <div class="btn-group">
+            <div class="btn">
+                <el-button type="primary" circle @click="selectFile">
+                    <el-icon>
+                        <Plus />
+                    </el-icon>
+                </el-button>
+            </div>
         </div>
     </div>
 </template>
@@ -76,6 +85,13 @@ const handleDragOver = (e: any) => {
     e.preventDefault()
 }
 
+const deleteItem = (id: string) => {
+    const list = [...props.list]
+    const index = list.findIndex(item => item.id === id)
+    list.splice(index, 1)
+    emit('update:list', list)
+}
+
 onMounted(() => {
     Sortable.create(boxContentRef.value, {
         // group: 'menu',
@@ -110,19 +126,26 @@ onMounted(() => {
     flex-wrap: wrap;
 }
 
-.box-card {
-    cursor: pointer;
+// item基础样式
+.card-default {
     transition-duration: 0.3s;
     padding: 10px;
-    min-width: 80px;
-    min-height: 80px;
+    width: 80px;
+    height: 80px;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
 
-    &:hover {
+.box-card {
+    cursor: pointer;
+    @extend .card-default;
+    position: relative;
+
+    .el-image:hover {
+        transition-duration: 0.3s;
         transform: scale(1.2);
     }
 
@@ -135,6 +158,14 @@ onMounted(() => {
         text-align: center;
         line-height: 30px;
     }
+
+    .delete-btn {
+        color: var(--el-color-danger);
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 1;
+    }
 }
 
 .sortable-drag {
@@ -146,14 +177,12 @@ onMounted(() => {
     opacity: 0.5;
 }
 
-.add-btn {
-    cursor: pointer;
-    display: inline-block;
-    transition-duration: 0.3s;
-    padding: 10px;
-    min-width: 80px;
-    min-height: 80px;
-    text-align: center;
-    line-height: 80px;
+.btn-group {
+    display: flex;
+    align-items: center;
+
+    .btn {
+        @extend .card-default;
+    }
 }
 </style>

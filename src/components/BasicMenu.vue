@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, toRaw } from 'vue'
+import { onMounted, ref, toRaw, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import Sortable from 'sortablejs';
 
@@ -154,14 +154,17 @@ const deleteMenu = (index: number) => {
 }
 
 const activeIndex = ref('0')
+let menuSortable: any
 onMounted(() => {
   setTimeout(() => {
-    Sortable.create(elMenuRef.value.$el, {
+    // 菜单排序
+    menuSortable = Sortable.create(elMenuRef.value.$el, {
       // group: 'menu',
       animation: 250,
       ghostClass: "sortable-ghost", //放置占位符的类名
       chosenClass: "sortable-chosen", //所选项目的类名
       forceFallback: true,
+      disabled: true,
 
       onEnd: (evt: any) => {
         const newInx = evt.newDraggableIndex
@@ -181,6 +184,14 @@ onMounted(() => {
       },
     })
   }, 0);
+})
+
+watch(isEdit, () => {
+  if (isEdit.value) {
+    menuSortable.option('disabled', false)
+  } else {
+    menuSortable.option('disabled', true)
+  }
 })
 </script>
 

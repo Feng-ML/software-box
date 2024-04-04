@@ -1,4 +1,5 @@
 <template>
+    <!-- 图标选择框 -->
     <el-dialog v-model="dialogVisible" title="选择图标" width="545">
         <div class="icon-box">
             <div class="icon-item" v-for="item in iconNames" :key="item" @click="selectIcon(item)">
