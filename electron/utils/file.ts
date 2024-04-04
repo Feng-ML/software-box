@@ -1,4 +1,6 @@
 import fs from 'fs';
+import { app } from 'electron'
+import { basename, extname } from 'node:path'
 
 export const readFile = (path: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -23,3 +25,23 @@ export const readFileInfo = (path: string): Promise<fs.Stats> => {
         });
     });
 };
+
+// 根据路径获取文件详情
+export const getFileDetail = (filePaths: string[] | string) => {
+    if (!Array.isArray(filePaths)) filePaths = [filePaths]
+
+    const allPromises = []
+    for (let i = 0; i < filePaths.length; i++) {
+        allPromises.push(app.getFileIcon(filePaths[i]))
+    }
+    return Promise.all(allPromises).then(res => {
+        return res.map((item, index) => {
+            return {
+                id: new Date().valueOf().toString() + index,
+                path: filePaths[index],
+                name: basename(filePaths[index], extname(filePaths[index])),
+                icon: item.toDataURL()
+            }
+        })
+    })
+}

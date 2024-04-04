@@ -1,18 +1,20 @@
 <template>
-    <div class="box-content" ref="boxContentRef">
-        <div v-for="i in list" :key="i.id" class="box-card" shadow="hover">
-            <el-tooltip class="box-item" effect="dark" :content="i.name" placement="top">
-                <el-image style="width: 80px; height: 80px" :src="i.icon" />
-                <!-- <div class="box-name">名称</div> -->
-            </el-tooltip>
+    <div class="software-box" @drop="handleDrop" @dragover="handleDragOver">
+        <div class="box-content" ref="boxContentRef">
+            <div v-for="i in list" :key="i.id" class="box-card" shadow="hover">
+                <el-tooltip class="box-item" effect="dark" :content="i.name" placement="top">
+                    <el-image style="width: 80px; height: 80px" :src="i.icon" />
+                    <!-- <div class="box-name">名称</div> -->
+                </el-tooltip>
+            </div>
         </div>
-    </div>
-    <div class="add-btn" @click="addItem">
-        <el-button type="primary" circle>
-            <el-icon>
-                <Plus />
-            </el-icon>
-        </el-button>
+        <div class="add-btn" @click="selectFile">
+            <el-button type="primary" circle>
+                <el-icon>
+                    <Plus />
+                </el-icon>
+            </el-button>
+        </div>
     </div>
 </template>
 
@@ -35,15 +37,43 @@ const props = defineProps({
     }
 })
 
-const addItem = async () => {
+const addItem = (file: any) => {
+    const list = [...props.list]
+    if (Array.isArray(file)) {
+        list.push(...file)
+    } else {
+        list.push(file)
+    }
+    emit('update:list', list)
+
+}
+
+const selectFile = async () => {
     window.ipcRenderer.invoke('dialog:openFile').then(file => {
         console.log(file);
         if (file) {
-            const list = [...props.list]
-            list.push(...file)
-            emit('update:list', list)
+            addItem(file)
         }
     })
+}
+
+// 移入文件保存
+const handleDrop = (e: any) => {
+    e.preventDefault()
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length) {
+        const filePaths = files.map((file: any) => file.path)
+        window.ipcRenderer.invoke('drag-file-into', filePaths).then(files => {
+            if (files) {
+                addItem(files)
+            }
+        })
+    }
+}
+
+const handleDragOver = (e: any) => {
+    e.preventDefault()
 }
 
 onMounted(() => {
@@ -54,21 +84,27 @@ onMounted(() => {
         dragClass: "sortable-drag", //所选项目的类名
         // filter: '.not-sort', // 禁用拖拽的类名
 
-        onEnd: ({ newIndex, oldIndex }: any) => {
+        onEnd: (evt: any) => {
+            const { oldIndex, newIndex } = evt;
             const list = [...props.list]
+
             // 交换位置
             if (newIndex !== oldIndex) {
                 const old = list.splice(oldIndex, 1)[0]
                 list.splice(newIndex, 0, old)
                 emit('update:list', list)
             }
-        },
+        }
     })
 })
 
 </script>
 
 <style lang="scss" scoped>
+.software-box {
+    height: 100%;
+}
+
 .box-content {
     display: flex;
     flex-wrap: wrap;
