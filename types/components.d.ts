@@ -23,5 +23,6 @@ declare module 'vue' {
     IconSelect: typeof import('./../src/components/IconSelect.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ToolBar: typeof import('./../src/components/ToolBar.vue')['default']
   }
 }

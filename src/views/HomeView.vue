@@ -5,7 +5,7 @@
     </div>
 
     <div id="content">
-      <BoxContent :list="softwareList" @update:list="updateSoftwareList" />
+      <BoxContent :list="softwareList" :has-menu="!!categoryList.length" @update:list="updateSoftwareList" />
     </div>
   </main>
 </template>
@@ -16,10 +16,13 @@ import BoxContent from "./boxContent.vue"
 import { nextTick, ref, shallowRef, watchEffect } from "vue";
 import type { ICategoryItem, ISoftware } from "@/interfaces";
 
+let activeIndex = 0
 const categoryList = shallowRef<ICategoryItem[]>([]);
 window.ipcRenderer.invoke("get-category-list").then((data: ICategoryItem[]) => {
-  categoryList.value = data
-  softwareList.value = categoryList.value[activeIndex].softwareList
+  if (data.length) {
+    categoryList.value = data
+    softwareList.value = categoryList.value[activeIndex].softwareList
+  }
 })
 
 const updateList = (list: ICategoryItem[]) => {
@@ -32,11 +35,10 @@ const updateList = (list: ICategoryItem[]) => {
 }
 
 // 软件列表
-let activeIndex = 0
 const softwareList = shallowRef<ISoftware[]>([])
 const selectMenu = (index: string) => {
   activeIndex = Number(index)
-  softwareList.value = categoryList.value[activeIndex].softwareList
+  softwareList.value = categoryList.value[activeIndex]?.softwareList
 }
 
 const updateSoftwareList = (list: ISoftware[]) => {

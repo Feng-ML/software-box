@@ -1,45 +1,29 @@
 <template>
-  <el-menu :default-active="activeIndex" ref="elMenuRef" class="el-menu" :collapse="isCollapse" @select="selectMenu">
-    <div class="menu-title">
-      <div>分类</div>
+  <el-menu :default-active="activeIndex" class="el-menu" :collapse="isCollapse" @select="selectMenu">
+    <ToolBar title="分类" v-model:is-edit="isEdit" @add="openAddFormDialog()" />
 
-      <div v-if="!isEdit" class="menu-tool">
-        <el-icon @click="isEdit = !isEdit" title="设置">
-          <Tools />
+    <div class="menu-content" ref="elMenuRef">
+      <el-menu-item v-for="(item, index) in list" :key="item.id" :index="index + ''">
+        <el-icon>
+          <component :is="item.icon" />
         </el-icon>
-        <!-- <el-icon @click="isCollapse = !isCollapse">
-          <Operation />
-        </el-icon> -->
-      </div>
-      <div v-else class="menu-tool">
-        <el-icon class="main-color" @click="openAddFormDialog()" title="添加">
-          <CirclePlusFilled />
-        </el-icon>
-        <el-icon class="success-color" @click="isEdit = !isEdit" title="完成"><Select /></el-icon>
-      </div>
+        <!-- <template #title>{{ item.name }}</template> -->
+        <div class="menu-item-name">{{ item.name }}</div>
+
+        <div class="menu-item-tool">
+          <el-icon class="el-icon-edit" v-show="isEdit" @click="openAddFormDialog(index)" title="编辑">
+            <Edit />
+          </el-icon>
+          <el-popconfirm title="确定删除吗?" @confirm.stop="deleteMenu(index)">
+            <template #reference>
+              <el-icon class="el-icon-delete" v-show="isEdit" title="删除">
+                <RemoveFilled />
+              </el-icon>
+            </template>
+          </el-popconfirm>
+        </div>
+      </el-menu-item>
     </div>
-
-
-    <el-menu-item v-for="(item, index) in list" :key="item.id" :index="index + ''">
-      <el-icon>
-        <component :is="item.icon" />
-      </el-icon>
-      <!-- <template #title>{{ item.name }}</template> -->
-      <div class="menu-item-name">{{ item.name }}</div>
-
-      <div class="menu-item-tool">
-        <el-icon class="el-icon-edit" v-show="isEdit" @click="openAddFormDialog(index)" title="编辑">
-          <Edit />
-        </el-icon>
-        <el-popconfirm title="确定删除吗?" @confirm.stop="deleteMenu(index)">
-          <template #reference>
-            <el-icon class="el-icon-delete" v-show="isEdit" title="删除">
-              <RemoveFilled />
-            </el-icon>
-          </template>
-        </el-popconfirm>
-      </div>
-    </el-menu-item>
   </el-menu>
 
   <BasicDialog :title="formTitle" v-model="dialogVisible" :form-type="formType" :form-data="formData" width="400"
@@ -47,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, toRaw, watch } from 'vue'
+import { onMounted, ref, toRaw, watch, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import Sortable from 'sortablejs';
 
@@ -55,6 +39,7 @@ import BasicDialog from './BasicDialog.vue'
 import type { IFormConfigItem } from './BasicDialog.vue';
 import type { ICategoryItem } from "@/interfaces";
 import { generateRandomId } from '@/utils/common'
+import ToolBar from './ToolBar.vue';
 
 const emit = defineEmits(['update:list', 'selectMenu'])
 
@@ -90,7 +75,9 @@ let formConfig: IFormConfigItem[] = [
   },
 ]
 
+const activeIndex = ref('0')
 const selectMenu = (index: string) => {
+  activeIndex.value = index
   emit('selectMenu', index)
 }
 
@@ -151,14 +138,19 @@ const deleteMenu = (index: number) => {
   const menuList = [...props.list]
   menuList.splice(index, 1)
   emit('update:list', menuList)
+  if (index === Number(activeIndex.value)) {
+    nextTick(() => {
+      activeIndex.value = '0'
+      emit('selectMenu', '0')
+    })
+  }
 }
 
-const activeIndex = ref('0')
 let menuSortable: any
 onMounted(() => {
   setTimeout(() => {
     // 菜单排序
-    menuSortable = Sortable.create(elMenuRef.value.$el, {
+    menuSortable = Sortable.create(elMenuRef.value, {
       // group: 'menu',
       animation: 250,
       ghostClass: "sortable-ghost", //放置占位符的类名
@@ -196,26 +188,16 @@ watch(isEdit, () => {
 </script>
 
 <style scoped lang="scss">
-.menu-title {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 20px;
-}
-
-.menu-tool {
-  text-align: right;
-  display: flex;
-  align-items: center;
-
-  .el-icon {
-    margin-left: 10px;
-    cursor: pointer;
-  }
-}
-
 .el-menu:not(.el-menu--collapse) {
   width: 200px;
-  min-height: 400px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-content {
+  overflow-y: auto;
+  flex: 1;
 }
 
 .menu-item-name {

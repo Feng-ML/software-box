@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="dialogVisible" :before-close="closeDialog">
+    <el-dialog v-model="model" :before-close="closeDialog">
         <div v-if="formConfig">
             <el-form ref="formRef" :model="form" :rules="formRules" label-width="auto">
                 <el-form-item v-for="item in formConfig" :key="item.prop" :label="item.label" :prop="item.prop">
@@ -30,7 +30,8 @@ import { reactive, ref, toRaw, watch, watchEffect } from 'vue';
 import type { FormInstance } from 'element-plus'
 import IconSelect from './IconSelect.vue'
 
-const emit = defineEmits(['update:modelValue', 'submit'])
+const emit = defineEmits(['submit'])
+const model = defineModel()
 
 export interface IFormConfigItem {
     label: string,
@@ -40,7 +41,6 @@ export interface IFormConfigItem {
     attrs?: Object
 }
 const props = defineProps({
-    modelValue: Boolean,
     formConfig: Array<IFormConfigItem>,
     formData: Object,
     formType: {
@@ -59,9 +59,7 @@ let formRules: IFormItem = reactive({})
 const formRef = ref<FormInstance>()
 const iconSelectRef = ref()
 
-let dialogVisible = ref(false)
-watch(() => props.modelValue, (newVal) => {
-    dialogVisible.value = newVal
+watch(model, (newVal) => {
     if (newVal) {
         // 设置规则
         formRef.value?.resetFields()
@@ -95,7 +93,7 @@ const iconSelect = (name: string) => {
 }
 
 const closeDialog = () => {
-    emit('update:modelValue', false)
+    model.value = false
 }
 
 const formConfirm = async (formEl: FormInstance | undefined) => {

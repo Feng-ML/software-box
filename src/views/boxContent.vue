@@ -1,21 +1,28 @@
 <template>
     <div class="software-box" @drop="handleDrop" @dragover="handleDragOver">
+        <ToolBar v-model:is-edit="isEdit" :showBtns="hasMenu" @add="selectFile" />
+
         <div class="box-content" ref="boxContentRef">
             <div v-for="i in list" :key="i.id" class="box-card">
                 <el-popconfirm title="确定删除吗?" @confirm.stop="deleteItem(i.id)">
                     <template #reference>
-                        <el-icon class="delete-btn" size="25">
+                        <el-icon v-show="isEdit" class="delete-btn" size="20">
                             <RemoveFilled />
                         </el-icon>
                     </template>
                 </el-popconfirm>
                 <el-tooltip class="box-item" effect="dark" :content="i.name" placement="top">
-                    <el-image style="width: 80px; height: 80px" :src="i.icon" />
+                    <el-image style="width: 100%; height: 100%" :src="i.icon" />
                     <!-- <div class="box-name">名称</div> -->
                 </el-tooltip>
             </div>
         </div>
-        <div class="btn-group">
+
+        <div class="empty" v-if="!list.length">
+            <div v-if="hasMenu">请通过文件拖拽或点击右上角按钮添加软件</div>
+            <div v-else>请先新增分类</div>
+        </div>
+        <!-- <div class="btn-group">
             <div class="btn">
                 <el-button type="primary" circle @click="selectFile">
                     <el-icon>
@@ -23,7 +30,7 @@
                     </el-icon>
                 </el-button>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -31,18 +38,20 @@
 import { onMounted, ref, watchEffect } from 'vue';
 import type { ISoftware } from "@/interfaces";
 import Sortable from 'sortablejs';
+import ToolBar from '@/components/ToolBar.vue';
 
 const emit = defineEmits(['update:list'])
 const boxContentRef = ref()
+const isEdit = ref(false)
 
 const props = defineProps({
     list: {
         type: Array<ISoftware>,
         default: () => [],
     },
-    active: {
-        type: Number,
-        default: 0
+    hasMenu: {
+        type: Boolean,
+        default: false,
     }
 })
 
@@ -124,14 +133,15 @@ onMounted(() => {
 .box-content {
     display: flex;
     flex-wrap: wrap;
+    padding: 0 10px;
 }
 
 // item基础样式
 .card-default {
     transition-duration: 0.3s;
     padding: 10px;
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     text-align: center;
     display: flex;
     flex-direction: column;

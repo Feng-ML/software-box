@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { app } from 'electron'
+import { app, nativeImage, shell } from 'electron'
 import { basename, extname } from 'node:path'
 
 export const readFile = (path: string): Promise<string> => {
@@ -32,7 +32,10 @@ export const getFileDetail = (filePaths: string[] | string) => {
 
     const allPromises = []
     for (let i = 0; i < filePaths.length; i++) {
-        allPromises.push(app.getFileIcon(filePaths[i]))
+        let path = filePaths[i]
+        // 处理快捷方式
+        if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
+        allPromises.push(app.getFileIcon(path, { size: 'large' }))
     }
     return Promise.all(allPromises).then(res => {
         return res.map((item, index) => {
