@@ -12,7 +12,7 @@
                     </template>
                 </el-popconfirm>
                 <el-tooltip class="box-item" effect="dark" :content="i.name" placement="top">
-                    <el-image style="width: 100%; height: 100%" :src="i.icon" />
+                    <el-image style="width: 100%; height: 100%" :src="i.icon" @click="openFile(i.path)" />
                     <!-- <div class="box-name">名称</div> -->
                 </el-tooltip>
             </div>
@@ -39,6 +39,7 @@ import { onMounted, ref, watchEffect } from 'vue';
 import type { ISoftware } from "@/interfaces";
 import Sortable from 'sortablejs';
 import ToolBar from '@/components/ToolBar.vue';
+import { ElMessage } from 'element-plus';
 
 const emit = defineEmits(['update:list'])
 const boxContentRef = ref()
@@ -79,9 +80,15 @@ const selectFile = async () => {
 const handleDrop = (e: any) => {
     e.preventDefault()
 
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length) {
-        const filePaths = files.map((file: any) => file.path)
+    const { files, types } = e.dataTransfer;
+    const fileList = Array.from(files);
+    if (fileList.length) {
+        if (types[0] !== 'Files') return ElMessage.error('只能添加exe、lnk文件！')
+        const canAddFileList = fileList.filter((file: any) => /\.(exe|lnk)$/i.test(file.name))
+        if (canAddFileList.length < fileList.length) ElMessage.warning('只能添加exe、lnk文件！')
+        if (!canAddFileList.length) return
+
+        const filePaths = canAddFileList.map((file: any) => file.path)
         window.ipcRenderer.invoke('drag-file-into', filePaths).then(files => {
             if (files) {
                 addItem(files)
@@ -99,6 +106,10 @@ const deleteItem = (id: string) => {
     const index = list.findIndex(item => item.id === id)
     list.splice(index, 1)
     emit('update:list', list)
+}
+
+const openFile = (path: string) => {
+    window.ipcRenderer.send('open-file', path)
 }
 
 onMounted(() => {
