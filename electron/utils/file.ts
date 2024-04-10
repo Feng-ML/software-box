@@ -34,7 +34,7 @@ export const getFileDetail = (filePaths: string[] | string) => {
     for (let i = 0; i < filePaths.length; i++) {
         let path = filePaths[i]
         // 处理快捷方式
-        if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
+        if (/\.lnk$/.test(path)) path = filePaths[i] = shell.readShortcutLink(path).target
         allPromises.push(app.getFileIcon(path, { size: 'large' }))
     }
     return Promise.all(allPromises).then(res => {
