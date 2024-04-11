@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, dialog, Tray, Menu, nativeImage } from 'electron'
 import { release } from 'node:os'
 import { join, dirname, basename, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -44,13 +44,16 @@ let win: BrowserWindow | null = null
 const preload = join(__dirname, '../preload/index.mjs')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
+const appIcon = join(process.env.VITE_PUBLIC, 'favicon.ico')
+const appTitle = 'Software-box'
 
-async function createWindow() {
+function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
     width: 1400,
     height: 800,
-    icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
+    icon: appIcon,
+    frame: false,
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -84,9 +87,32 @@ async function createWindow() {
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
+// 创建系统托盘
+let tray
+function createTray() {
+  // 托盘图标
+  const icon = nativeImage.createFromPath(appIcon)
+  tray = new Tray(icon)
+  tray.setToolTip(appTitle)
+  const contextMenu = Menu.buildFromTemplate([
+    { label: '退出', role: 'quit' }
+  ])
+  tray.setContextMenu(contextMenu)
+  tray.on('click', () => {
+    if (win.isVisible()) {
+      win.hide()
+      win.setSkipTaskbar(true);
+    } else {
+      win.show()
+      win.setSkipTaskbar(false);
+    }
+  })
+}
+
 app.whenReady().then(() => {
   ipcHandler()
   createWindow()
+  createTray()
 })
 
 app.on('window-all-closed', () => {
