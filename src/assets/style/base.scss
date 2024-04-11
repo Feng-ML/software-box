@@ -29,6 +29,21 @@ body {
   font-weight: normal;
 }
 
+//===== 滚动条样式 =====//
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  background: #cccccc;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b2b2b2;
+}
+//====================//
+
 .empty {
   text-align: center;
   color: var(--el-color-info);

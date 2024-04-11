@@ -1,65 +1,86 @@
 <template>
-  <main>
-    <div id="menu">
-      <BasicMenu :list="categoryList" @update:list="updateList" @selectMenu="selectMenu" />
+  <div class="home">
+    <div class="home-tabs">
+      <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+        <el-tab-pane class="tabs-item" v-for="(item, index) in routeList" :key="item.name" :name="item.path">
+          <template #label>
+            <span class="tabs-label">
+              <el-icon class="tabs-icon">
+                <component :is="item.icon" />
+              </el-icon>
+              <span>{{ item.name }}</span>
+            </span>
+          </template>
+        </el-tab-pane>
+      </el-tabs>
     </div>
-
-    <div id="content">
-      <BoxContent :list="softwareList" :has-menu="!!categoryList.length" @update:list="updateSoftwareList" />
+    <div class="home-container">
+      <RouterView />
     </div>
-  </main>
+  </div>
 </template>
 
-<script lang="ts" setup>
-import BasicMenu from "@/components/BasicMenu.vue"
-import BoxContent from "./boxContent.vue"
-import { nextTick, ref, shallowRef, watchEffect } from "vue";
-import type { ICategoryItem, ISoftware } from "@/interfaces";
+<script setup lang="ts">
+import { RouterView, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import type { TabsPaneContext } from 'element-plus'
 
-let activeIndex = 0
-const categoryList = shallowRef<ICategoryItem[]>([]);
-window.ipcRenderer.invoke("get-category-list").then((data: ICategoryItem[]) => {
-  if (data.length) {
-    categoryList.value = data
-    softwareList.value = categoryList.value[activeIndex].softwareList
-  }
-})
+const router = useRouter()
+const activeName = ref('/software-management')
+const routeList = [
+  {
+    name: '软件管理',
+    path: '/software-management',
+    icon: 'memo',
+  },
+  {
+    name: '个人中心',
+    path: '/',
+    icon: 'Avatar',
+  },
+]
 
-const updateList = (list: ICategoryItem[]) => {
-  categoryList.value = []
+const handleClick = (tab: TabsPaneContext) => {
+  console.log(tab.paneName);
 
-  nextTick(() => {
-    categoryList.value = list
-    window.ipcRenderer.send("set-category-list", list)
-  })
+  router.push(tab.paneName as string || "/")
 }
-
-// 软件列表
-const softwareList = shallowRef<ISoftware[]>([])
-const selectMenu = (index: string) => {
-  activeIndex = Number(index)
-  softwareList.value = categoryList.value[activeIndex]?.softwareList
-}
-
-const updateSoftwareList = (list: ISoftware[]) => {
-  console.log(list);
-
-  softwareList.value = list
-  categoryList.value[activeIndex].softwareList = list
-  updateList(categoryList.value)
-}
-
 </script>
 
-<style scoped lang="scss">
-main {
-  display: flex;
-  width: 100%;
-  height: 100%;
+<style lang="scss">
+.home {
+  --tabs-height: 40px;
+  height: 100vh;
+  overflow: hidden;
 }
 
-#content {
-  flex: 1;
-  // background-color: aquamarine;
+.home-tabs {
+  height: var(--tabs-height);
+
+  .el-tabs__item {
+    padding: 5px;
+  }
+
+  .el-tabs__item.is-top:nth-child(2) {
+    padding-left: 20px;
+  }
+
+  .el-tabs__header {
+    margin: 0;
+  }
+
+  .tabs-label {
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .tabs-icon {
+    margin-right: 5px;
+  }
+}
+
+.home-container {
+  height: calc(100% - var(--tabs-height));
 }
 </style>

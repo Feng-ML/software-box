@@ -22,6 +22,7 @@
                     <!-- <div class="box-name">名称</div> -->
                 </el-tooltip>
             </div>
+            <!-- <div v-for="i in 150" class="box-card"><el-image style="width: 100%; height: 100%" /></div> -->
         </div>
 
     </div>
@@ -144,7 +145,7 @@ watch(isEdit, () => {
 
 <style lang="scss" scoped>
 .software-box {
-    height: 100vh;
+    height: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -156,7 +157,6 @@ watch(isEdit, () => {
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
     gap: 20px;
     overflow-y: auto;
-    overflow-x: hidden;
     padding: 20px;
 }
 

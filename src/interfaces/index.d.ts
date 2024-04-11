@@ -1,12 +1,12 @@
 
-interface ISoftware {
+declare type ISoftware = {
     id: string;
     name: string;
     icon: string;
     path: string;
 }
 
-export interface ICategoryItem {
+export declare type ICategoryItem = {
     id: string;
     name: string;
     icon: string;

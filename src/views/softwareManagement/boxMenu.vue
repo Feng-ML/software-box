@@ -7,7 +7,6 @@
         <el-icon>
           <component :is="item.icon" />
         </el-icon>
-        <!-- <template #title>{{ item.name }}</template> -->
         <div class="menu-item-name">{{ item.name }}</div>
 
         <div class="menu-item-tool">
@@ -35,11 +34,11 @@ import { onMounted, ref, toRaw, watch, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import Sortable from 'sortablejs';
 
-import BasicDialog from './BasicDialog.vue'
-import type { IFormConfigItem } from './BasicDialog.vue';
+import BasicDialog from '@/components/BasicDialog.vue'
+import type { IFormConfigItem } from '@/components/BasicDialog.vue';
 import type { ICategoryItem } from "@/interfaces";
 import { generateRandomId } from '@/utils/common'
-import ToolBar from './ToolBar.vue';
+import ToolBar from '@/components/ToolBar.vue';
 
 const emit = defineEmits(['update:list', 'selectMenu'])
 
@@ -190,7 +189,7 @@ watch(isEdit, () => {
 <style scoped lang="scss">
 .el-menu:not(.el-menu--collapse) {
   width: 200px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }

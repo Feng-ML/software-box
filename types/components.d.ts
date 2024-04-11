@@ -19,6 +19,8 @@ declare module 'vue' {
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElPopconfirm: typeof import('element-plus/es')['ElPopconfirm']
+    ElTabPane: typeof import('element-plus/es')['ElTabPane']
+    ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     IconSelect: typeof import('./../src/components/IconSelect.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

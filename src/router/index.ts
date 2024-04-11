@@ -6,8 +6,16 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
+      name: '首页',
+      component: HomeView,
+      redirect: '/software-management',
+      children: [
+        {
+          path: 'software-management',
+          name: '软件管理',
+          component: () => import('@/views/softwareManagement/index.vue')
+        }
+      ]
     },
   ]
 })
