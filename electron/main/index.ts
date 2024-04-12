@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, dialog, Tray, Menu, nativeImage } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, dialog, Tray, Menu, nativeImage, screen } from 'electron'
 import { release } from 'node:os'
 import { join, dirname, basename, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -53,7 +53,7 @@ function createWindow() {
     width: 1400,
     height: 800,
     icon: appIcon,
-    frame: false,
+    // frame: false,
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -95,6 +95,13 @@ function createTray() {
   tray = new Tray(icon)
   tray.setToolTip(appTitle)
   const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '显示悬浮球', click: () => {
+        floatingBall.show()
+        floatingBall.setAlwaysOnTop(true)
+      }
+    },
+    { label: '隐藏悬浮球', click: () => { floatingBall.hide() } },
     { label: '退出', role: 'quit' }
   ])
   tray.setContextMenu(contextMenu)
@@ -109,10 +116,76 @@ function createTray() {
   })
 }
 
+// 创建悬浮球
+let floatingBall: BrowserWindow | null = null
+function createFloatingBall() {
+  const ballSize = 60
+  const winWidth = ballSize
+  const winHeight = ballSize
+
+  floatingBall = new BrowserWindow({
+    width: winWidth,
+    height: winHeight,
+    type: 'toolbar',  //创建的窗口类型为工具栏窗口
+    frame: false,  //要创建无边框窗口
+    resizable: false, //禁止窗口大小缩放
+    maximizable: false,
+    minimizable: false,
+    webPreferences: {
+      preload,
+      devTools: false //关闭调试工具
+    },
+    transparent: true, //设置透明
+    hasShadow: false, //不显示阴影
+    alwaysOnTop: true, //窗口是否总是显示在其他窗口之前
+    // backgroundColor: '#eee',
+  })
+
+  //通过获取用户屏幕的宽高来设置悬浮球的初始位置
+  const [screenWidth, screenHeight] = [screen.getPrimaryDisplay().workAreaSize.width, screen.getPrimaryDisplay().workAreaSize.height]
+  floatingBall.setPosition(screenWidth - 160, screenHeight - 320) //设置悬浮球位置
+  const routeUrl = 'desktop/floatingBall'
+  if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
+    floatingBall.loadURL(url + routeUrl)
+  } else {
+    floatingBall.loadFile(`file://${indexHtml + routeUrl}`)
+  }
+
+  function setPos(x, y) {
+    // 不用setPosition，因为在Win系统下移动窗口尺寸可能会改变
+    floatingBall.setBounds({ x, y, width: winWidth, height: winHeight })
+  }
+
+  floatingBall.on('close', () => {
+    floatingBall = null
+  })
+
+  ipcMain.on('ball-move', (e, { x, y }) => {
+    setPos(x, y)
+  })
+
+  ipcMain.on('ball-moved', (e) => {
+    const [left, top] = floatingBall.getPosition()
+
+    // 悬浮球侧边吸附
+    if (top <= 0) setPos(left, 0)
+    if (top > screenHeight - winHeight) setPos(left, screenHeight - winHeight)
+    if (left <= 0) {
+      setPos(-winWidth / 2, top)
+      floatingBall.webContents.send('adsorb-aside', 'left')
+    }
+    if (left >= screenWidth - winWidth) {
+      setPos(screenWidth - winWidth / 2, top)
+      floatingBall.webContents.send('adsorb-aside', 'right')
+    }
+  })
+}
+
 app.whenReady().then(() => {
   ipcHandler()
   createWindow()
   createTray()
+  createFloatingBall()
 })
 
 app.on('window-all-closed', () => {
