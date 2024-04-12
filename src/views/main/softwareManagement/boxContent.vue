@@ -152,7 +152,6 @@ watch(isEdit, () => {
 }
 
 .box-content {
-    flex: 1;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
     gap: 20px;

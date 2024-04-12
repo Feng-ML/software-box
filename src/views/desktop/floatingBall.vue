@@ -1,6 +1,6 @@
 <template>
     <div id="ballWin" @mousedown="mousedown">
-        <div class="ballBox" :class="aside" @click="ballClick">
+        <div class="ballBox" :class="aside">
             <img draggable="false" src="@/assets/images/Bartender.png" alt="">
         </div>
     </div>
@@ -17,18 +17,16 @@ const aside = ref<string>('');
 //     aside.value = value;
 // })
 
-const ballClick = () => {
-    // alert('asdasd');
-}
-
+let isMouseDown = false;
 let ismoving = false;
 const mousedown = (e: any) => {
-    ismoving = true
+    isMouseDown = true;
     let dinatesX = e.x
     let dinatesY = e.y
 
-    document.onmousemove = (ev) => {
-        if (ismoving) {
+    document.onmousemove = function (ev) {
+        if (isMouseDown) {
+            ismoving = true
             const x = ev.screenX - dinatesX
             const y = ev.screenY - dinatesY
             // 给主进程传入坐标
@@ -36,7 +34,10 @@ const mousedown = (e: any) => {
         }
     };
     document.onmouseup = (ev) => {
+        // 点击事件(窗口聚焦首次点击不生效)
+        if (!ismoving && isMouseDown) window.ipcRenderer.send('ball-click')
         ismoving = false
+        isMouseDown = false
         window.ipcRenderer.send('ball-moved')
     };
 }

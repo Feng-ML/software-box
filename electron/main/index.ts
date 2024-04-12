@@ -179,6 +179,46 @@ function createFloatingBall() {
       floatingBall.webContents.send('adsorb-aside', 'right')
     }
   })
+
+  ipcMain.on('ball-click', () => {
+    const [left, top] = floatingBall.getPosition()
+    const leftPos = left < screenWidth / 2 ? left + winWidth + 30 : left - 630
+    softwareDialog.setPosition(leftPos, top - 50)
+    softwareDialog.show()
+  })
+}
+
+// 创建软件悬浮框
+let softwareDialog: BrowserWindow | null = null
+function createSoftwareDialog() {
+  softwareDialog = new BrowserWindow({
+    width: 600,
+    height: 400,
+    show: false,
+    frame: false,  //要创建无边框窗口
+    resizable: false, //禁止窗口大小缩放
+    maximizable: false,
+    minimizable: false,
+    alwaysOnTop: true, //窗口是否总是显示在其他窗口之前
+    skipTaskbar: true,
+    webPreferences: {
+      preload,
+      devTools: false //关闭调试工具
+    }
+    // transparent: true, //设置透明
+    // hasShadow: false, //不显示阴影
+  })
+
+  const routeUrl = 'desktop/software-management'
+  if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
+    softwareDialog.loadURL(url + routeUrl)
+  } else {
+    softwareDialog.loadFile(`file://${indexHtml + routeUrl}`)
+  }
+
+  softwareDialog.on('blur', () => {
+    softwareDialog.hide()
+  })
 }
 
 app.whenReady().then(() => {
@@ -186,6 +226,7 @@ app.whenReady().then(() => {
   createWindow()
   createTray()
   createFloatingBall()
+  createSoftwareDialog()
 })
 
 app.on('window-all-closed', () => {
