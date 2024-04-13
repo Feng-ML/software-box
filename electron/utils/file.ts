@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { app, nativeImage, shell } from 'electron'
 import { basename, extname } from 'node:path'
+import { generateRandomId } from '../../src/utils/common'
 
 export const readFile = (path: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -34,16 +35,38 @@ export const getFileDetail = (filePaths: string[] | string) => {
     for (let i = 0; i < filePaths.length; i++) {
         let path = filePaths[i]
         // 处理快捷方式
-        if (/\.lnk$/.test(path)) path = filePaths[i] = shell.readShortcutLink(path).target
+        if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
         allPromises.push(app.getFileIcon(path, { size: 'large' }))
     }
     return Promise.all(allPromises).then(res => {
         return res.map((item, index) => {
             return {
-                id: new Date().valueOf().toString() + index,
+                id: generateRandomId(20),
                 path: filePaths[index],
                 name: basename(filePaths[index], extname(filePaths[index])),
-                icon: item.toDataURL()
+                icon: item.toDataURL(),
+                info: fs.statSync(filePaths[index])
+            }
+        })
+    })
+}
+
+// 根据路径获取图片详情
+export const getImageDetail = (filePaths: string[] | string) => {
+    if (!Array.isArray(filePaths)) filePaths = [filePaths]
+
+    const allPromises = []
+    for (let i = 0; i < filePaths.length; i++) {
+        let path = filePaths[i]
+        allPromises.push(readFileInfo(path))
+    }
+    return Promise.all(allPromises).then(res => {
+        return res.map((item, index) => {
+            return {
+                name: basename(filePaths[index], extname(filePaths[index])),
+                path: filePaths[index],
+                info: item,
+                img: nativeImage.createFromPath(filePaths[index])
             }
         })
     })

@@ -13,8 +13,14 @@
 <script lang="ts" setup>
 import BoxMenu from "./boxMenu.vue"
 import BoxContent from "./boxContent.vue"
-import { nextTick, ref, shallowRef, watchEffect } from "vue";
+import { nextTick, ref, shallowRef, provide } from "vue";
 import type { ICategoryItem, ISoftware } from "@/interfaces";
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+// 是否为桌面组件
+const isDesktop = route.fullPath.includes('desktop')
+provide('isDesktop', isDesktop)
 
 let activeIndex = 0
 const categoryList = shallowRef<ICategoryItem[]>([]);
@@ -23,6 +29,11 @@ window.ipcRenderer.invoke("get-category-list").then((data: ICategoryItem[]) => {
         categoryList.value = data
         softwareList.value = categoryList.value[activeIndex].softwareList
     }
+})
+
+// 刷新软件悬浮框
+window.ipcRenderer.on("category-list-change", (event, data: ICategoryItem[]) => {
+    if (isDesktop) location.reload()
 })
 
 const updateList = (list: ICategoryItem[]) => {

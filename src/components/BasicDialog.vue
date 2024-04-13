@@ -2,15 +2,24 @@
     <el-dialog v-model="model" :before-close="closeDialog">
         <div v-if="formConfig">
             <el-form ref="formRef" :model="form" :rules="formRules" label-width="auto">
-                <el-form-item v-for="item in formConfig" :key="item.prop" :label="item.label" :prop="item.prop">
-                    <el-input v-if="item.type === 'input'" v-model="form[item.prop as keyof IFormItem]"
-                        v-bind="item.attrs || {}" />
-                    <div v-if="item.type === 'icon'" class="icon-is-select">
-                        <el-icon @click="iconSelectDialogOpen">
-                            <component :is="form[item.prop as keyof IFormItem]" />
-                        </el-icon>
+                <div v-for="item in formConfig">
+                    <div v-if="item.type === 'img'" class="img-is-select" @click="imgSelect">
+                        <img v-if="form[item.prop]" :src="form[item.prop]" />
+                        <img v-else src="@/assets/images/Bartender.png" alt="">
                     </div>
-                </el-form-item>
+
+                    <el-form-item v-else :key="item.prop" :label="item.label" :prop="item.prop">
+
+                        <el-input v-if="item.type === 'input'" v-model="form[item.prop]" v-bind="item.attrs || {}" />
+
+                        <div v-if="item.type === 'icon'" class="icon-is-select">
+                            <el-icon @click="iconSelectDialogOpen">
+                                <component :is="form[item.prop]" />
+                            </el-icon>
+                        </div>
+
+                    </el-form-item>
+                </div>
             </el-form>
             <IconSelect ref="iconSelectRef" @select="iconSelect" />
         </div>
@@ -29,6 +38,7 @@
 import { reactive, ref, toRaw, watch, watchEffect } from 'vue';
 import type { FormInstance } from 'element-plus'
 import IconSelect from './IconSelect.vue'
+import { ElMessage } from 'element-plus';
 
 const emit = defineEmits(['submit'])
 const model = defineModel()
@@ -65,31 +75,54 @@ watch(model, (newVal) => {
         formRef.value?.resetFields()
         if (props.formConfig) {
             props.formConfig.forEach(item => {
-                if (item.rules) formRules[item.prop as keyof IFormItem] = item.rules
-                if (item.type === 'icon') iconAttrName.value = item.prop
+                if (item.rules) formRules[item.prop] = item.rules
+                if (item.type === 'icon') iconAttrName = item.prop
+                if (item.type === 'img') imgAttrName = item.prop
             })
             // 默认添加图标
-            if (props.formType === "add") {
-                form[iconAttrName.value as keyof IFormItem] = "Shop"
+            if (props.formType === "add" && iconAttrName) {
+                form[iconAttrName] = "Shop"
             }
         }
         if (props.formType === "edit") {
             Object.assign(form, props.formData)
         }
     } else {
-        //清空数据
-        form = reactive({})
-        formRules = reactive({})
+        //清空数据(setTimeout避免内容闪烁)
+        setTimeout(() => {
+            form = reactive({})
+            formRules = reactive({})
+            iconAttrName = ''
+        }, 10)
     }
 })
 
 // 图标选择
-const iconAttrName = ref<string>('')
+let iconAttrName = ''
 const iconSelectDialogOpen = () => {
     iconSelectRef.value?.show()
 }
 const iconSelect = (name: string) => {
-    form[iconAttrName.value as keyof IFormItem] = name
+    form[iconAttrName] = name
+}
+
+// 图片选择
+let imgAttrName = ''
+const imgSelect = () => {
+    const options = {
+        type: 'image',
+        filters: [
+            { name: 'image', extensions: ['bmp', 'jpg', 'png', 'gif', 'ico', 'svg', 'jpeg'] },
+        ]
+    }
+    window.ipcRenderer.invoke('dialog:openFile', options).then(files => {
+        if (files) {
+            const imgDetail = files[0]
+            const isLt2M = imgDetail.info.size / 1024 / 1024 < 2;
+            if (!isLt2M) return ElMessage.error('图片大小不能超过 2MB!');
+            form[imgAttrName] = imgDetail.img.toDataURL()
+        }
+    })
 }
 
 const closeDialog = () => {
@@ -116,5 +149,18 @@ const formConfirm = async (formEl: FormInstance | undefined) => {
     display: flex;
     align-items: center;
     cursor: pointer;
+}
+
+.img-is-select {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    cursor: pointer;
+    margin: auto;
+    margin-bottom: 20px;
+
+    img {
+        width: 100%;
+    }
 }
 </style>

@@ -39,7 +39,6 @@ if (!app.requestSingleInstanceLock()) {
 // Read more on https://www.electronjs.org/docs/latest/tutorial/security
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-let win: BrowserWindow | null = null
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.mjs')
 const url = process.env.VITE_DEV_SERVER_URL
@@ -47,6 +46,7 @@ const indexHtml = join(process.env.DIST, 'index.html')
 const appIcon = join(process.env.VITE_PUBLIC, 'favicon.ico')
 const appTitle = 'Software-box'
 
+export let win: BrowserWindow | null = null
 function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
@@ -84,7 +84,22 @@ function createWindow() {
     if (url.startsWith('https:')) shell.openExternal(url)
     return { action: 'deny' }
   })
-  // win.webContents.on('will-navigate', (event, url) => { }) #344
+
+  // 右键菜单
+  ipcMain.on('show-context-menu', (event) => {
+    const template = [
+      {
+        label: '图标设置',
+        click: () => { event.sender.send('context-menu-command', '修改') }
+      },
+      {
+        label: '图标删除',
+        click: () => { event.sender.send('context-menu-command', '删除') }
+      },
+    ]
+    const menu = Menu.buildFromTemplate(template)
+    menu.popup({ window: BrowserWindow.fromWebContents(event.sender) })
+  })
 }
 
 // 创建系统托盘
@@ -189,7 +204,7 @@ function createFloatingBall() {
 }
 
 // 创建软件悬浮框
-let softwareDialog: BrowserWindow | null = null
+export let softwareDialog: BrowserWindow | null = null
 function createSoftwareDialog() {
   softwareDialog = new BrowserWindow({
     width: 600,

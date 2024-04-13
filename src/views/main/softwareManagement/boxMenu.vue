@@ -1,6 +1,6 @@
 <template>
   <el-menu :default-active="activeIndex" class="el-menu" :collapse="isCollapse" @select="selectMenu">
-    <ToolBar title="分类" v-model:is-edit="isEdit" @add="openAddFormDialog()" />
+    <ToolBar title="分类" v-model:is-edit="isEdit" :show-btns="!isDesktop" @add="openAddFormDialog()" />
 
     <div class="menu-content" ref="elMenuRef">
       <el-menu-item v-for="(item, index) in list" :key="item.id" :index="index + ''">
@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, toRaw, watch, nextTick } from 'vue'
+import { onMounted, ref, toRaw, watch, nextTick, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import Sortable from 'sortablejs';
 
@@ -40,6 +40,7 @@ import type { ICategoryItem } from "@/interfaces";
 import { generateRandomId } from '@/utils/common'
 import ToolBar from '@/components/ToolBar.vue';
 
+const isDesktop = inject('isDesktop')
 const emit = defineEmits(['update:list', 'selectMenu'])
 
 const isCollapse = ref(false)

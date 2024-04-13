@@ -1,14 +1,15 @@
 <template>
     <div class="software-box" @drop="handleDrop" @dragover="handleDragOver">
-        <ToolBar title="软件" v-model:is-edit="isEdit" :showBtns="hasMenu" @add="selectFile" />
+        <ToolBar title="软件" v-model:is-edit="isEdit" :showBtns="!isDesktop && hasMenu" @add="selectFile" />
 
         <div class="empty" v-if="!list.length">
-            <div v-if="hasMenu">请通过文件拖拽或点击右上角按钮添加软件</div>
+            <div v-if="isDesktop">请在主页面添加软件</div>
+            <div v-else-if="hasMenu">请通过文件拖拽或点击右上角按钮添加软件</div>
             <div v-else>请先新增分类</div>
         </div>
 
         <div class="box-content" ref="boxContentRef">
-            <div v-for="i in list" :key="i.id" class="box-card">
+            <div v-for="i in list" :key="i.id" class="box-card" @contextmenu="handleContextMenu(i)">
                 <el-popconfirm title="确定删除吗?" @confirm.stop="deleteItem(i.id)">
                     <template #reference>
                         <el-icon v-show="isEdit" class="delete-btn" size="20">
@@ -25,16 +26,24 @@
             <!-- <div v-for="i in 150" class="box-card"><el-image style="width: 100%; height: 100%" /></div> -->
         </div>
 
+        <BasicDialog title="图标设置" v-model="dialogVisible" form-type="edit" :form-data="formData" width="500"
+            :form-config="formConfig" @submit="formSubmit" />
     </div>
 </template>
 
 <script lang='ts' setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, inject } from 'vue';
 import type { ISoftware } from "@/interfaces";
 import Sortable from 'sortablejs';
 import ToolBar from '@/components/ToolBar.vue';
 import { ElMessage } from 'element-plus';
 import { throttle } from '@/utils/common';
+import BasicDialog from '@/components/BasicDialog.vue'
+import type { IFormConfigItem } from '@/components/BasicDialog.vue';
+
+// 桌面组件
+const isDesktop = inject('isDesktop')
+
 
 const emit = defineEmits(['update:list'])
 const boxContentRef = ref()
@@ -59,11 +68,15 @@ const addItem = (file: any) => {
         list.push(file)
     }
     emit('update:list', list)
-
 }
 
 const selectFile = async () => {
-    window.ipcRenderer.invoke('dialog:openFile').then(file => {
+    const options = {
+        filters: [
+            { name: 'software', extensions: ['exe', 'lnk', 'url'] }
+        ]
+    }
+    window.ipcRenderer.invoke('dialog:openFile', options).then(file => {
         console.log(file);
         if (file) {
             addItem(file)
@@ -98,6 +111,44 @@ const handleDragOver = (e: any) => {
     e.preventDefault()
 }
 
+// 修改
+const dialogVisible = ref(false)
+let formData: object
+let formConfig: IFormConfigItem[] = [
+    {
+        label: '图标',
+        prop: 'icon',
+        type: 'img',
+    },
+    {
+        label: '名称',
+        prop: 'name',
+        type: 'input',
+        rules: [{ required: true, message: '图标名称不能为空', trigger: 'blur' }],
+        attrs: {
+            placeholder: '请输入图标名称',
+        }
+    },
+    {
+        label: '路径',
+        prop: 'path',
+        type: 'input',
+        rules: [{ required: true, message: '启动路径不能为空', trigger: 'blur' }],
+        attrs: {
+            placeholder: '请输入启动路径',
+        }
+    },
+]
+const formSubmit = (data: any) => {
+    const list = [...props.list]
+    const index = list.findIndex(item => item.id === data.id)
+    list.splice(index, 1, data)
+    emit('update:list', list)
+    dialogVisible.value = false
+}
+
+
+// 删除
 const deleteItem = (id: string) => {
     const list = [...props.list]
     const index = list.findIndex(item => item.id === id)
@@ -106,9 +157,33 @@ const deleteItem = (id: string) => {
 }
 
 const openFile = throttle(function (path: string) {
+    if (isEdit.value) return
     window.ipcRenderer.send('open-file', path)
 }, 1000)
 
+// 右键菜单
+let selectItem: ISoftware;
+const handleContextMenu = (item: ISoftware) => {
+    if (!isDesktop) {
+        selectItem = item;
+        window.ipcRenderer.send('show-context-menu')
+    }
+}
+window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
+    switch (command) {
+        case '修改':
+            formData = selectItem
+            dialogVisible.value = true
+            break;
+        case '删除':
+            selectItem && deleteItem(selectItem.id)
+            break;
+        default:
+            break;
+    }
+})
+
+// 排序拖拽组件
 let boxSortable: any;
 onMounted(() => {
     boxSortable = Sortable.create(boxContentRef.value, {
