@@ -1,7 +1,9 @@
 import fs from 'fs';
 import { app, nativeImage, shell } from 'electron'
-import { basename, extname } from 'node:path'
+import { basename, extname, join } from 'node:path'
 import { generateRandomId } from '../../src/utils/common'
+
+const imageUrl = join(app.getAppPath(), 'src/assets/images/')
 
 export const readFile = (path: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -32,20 +34,32 @@ export const getFileDetail = (filePaths: string[] | string) => {
     if (!Array.isArray(filePaths)) filePaths = [filePaths]
 
     const allPromises = []
+    const allowPaths = []
+    const dirIndexs = []
     for (let i = 0; i < filePaths.length; i++) {
         let path = filePaths[i]
         // 处理快捷方式
         if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
-        allPromises.push(app.getFileIcon(path, { size: 'large' }))
+        // 判断是否为文件夹
+        if (fs.statSync(path).isDirectory()) {
+            allPromises.push(Promise.resolve(nativeImage.createFromPath(imageUrl + 'directory.png')))
+            allowPaths.push(filePaths[i])
+            dirIndexs.push(i)
+        } else {
+            if (/\.(exe|bat|vbs|url)$/i.test(path)) {
+                allPromises.push(app.getFileIcon(path, { size: 'large' }))
+                allowPaths.push(filePaths[i])
+            }
+        }
     }
     return Promise.all(allPromises).then(res => {
         return res.map((item, index) => {
             return {
                 id: generateRandomId(20),
-                path: filePaths[index],
-                name: basename(filePaths[index], extname(filePaths[index])),
+                path: allowPaths[index],
+                name: dirIndexs.includes(index) ? basename(allowPaths[index]) : basename(allowPaths[index], extname(allowPaths[index])),
                 icon: item.toDataURL(),
-                info: fs.statSync(filePaths[index])
+                info: fs.statSync(allowPaths[index])
             }
         })
     })

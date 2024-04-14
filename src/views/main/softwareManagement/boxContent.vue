@@ -73,7 +73,7 @@ const addItem = (file: any) => {
 const selectFile = async () => {
     const options = {
         filters: [
-            { name: 'software', extensions: ['exe', 'lnk', 'url'] }
+            { name: 'software', extensions: ['exe', 'lnk', 'bat', 'vbs', 'url'] }
         ]
     }
     window.ipcRenderer.invoke('dialog:openFile', options).then(file => {
@@ -93,14 +93,10 @@ const handleDrop = (e: any) => {
 
     const fileList = Array.from(files);
     if (!fileList.length) return
-    if (types[0] !== 'Files') return ElMessage.error('只能添加exe、lnk文件！')
-    const canAddFileList = fileList.filter((file: any) => /\.(exe|lnk)$/i.test(file.name))
-    if (canAddFileList.length < fileList.length) ElMessage.warning('只能添加exe、lnk文件！')
-    if (!canAddFileList.length) return
 
-    const filePaths = canAddFileList.map((file: any) => file.path)
+    const filePaths = fileList.map((file: any) => file.path)
     window.ipcRenderer.invoke('drag-file-into', filePaths).then(files => {
-        if (files) {
+        if (files && files.length) {
             addItem(files)
         }
     })
@@ -221,6 +217,7 @@ watch(isEdit, () => {
 <style lang="scss" scoped>
 .software-box {
     height: 100%;
+    width: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -231,6 +228,7 @@ watch(isEdit, () => {
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
     gap: 20px;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
 }
 
