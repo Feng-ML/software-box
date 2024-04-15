@@ -48,7 +48,7 @@ const appTitle = 'Software-box'
 
 export let win: BrowserWindow | null = null
 function createWindow() {
-  Menu.setApplicationMenu(null) // null值取消顶部菜单栏
+  // Menu.setApplicationMenu(null) // null值取消顶部菜单栏
   win = new BrowserWindow({
     title: 'Main window',
     width: 1400,
@@ -145,7 +145,7 @@ function createTray() {
 // 创建悬浮球
 let floatingBall: BrowserWindow | null = null
 function createFloatingBall() {
-  const ballSize = 60
+  const ballSize = 50
   const winWidth = ballSize
   const winHeight = ballSize
 

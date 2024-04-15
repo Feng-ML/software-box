@@ -1,21 +1,23 @@
 <template>
-  <div class="home">
-    <div class="home-tabs">
-      <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-        <el-tab-pane class="tabs-item" v-for="(item, index) in routeList" :key="item.name" :name="item.path">
-          <template #label>
-            <span class="tabs-label">
-              <el-icon class="tabs-icon">
-                <component :is="item.icon" />
-              </el-icon>
-              <span>{{ item.name }}</span>
-            </span>
-          </template>
-        </el-tab-pane>
-      </el-tabs>
-    </div>
-    <div class="home-container">
-      <RouterView />
+  <div class="">
+    <div class="home">
+      <div class="home-tabs">
+        <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+          <el-tab-pane class="tabs-item" v-for="(item, index) in routeList" :key="item.name" :name="item.path">
+            <template #label>
+              <span class="tabs-label">
+                <el-icon class="tabs-icon">
+                  <component :is="item.icon" />
+                </el-icon>
+                <span>{{ item.name }}</span>
+              </span>
+            </template>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+      <div class="home-container">
+        <RouterView />
+      </div>
     </div>
   </div>
 </template>
