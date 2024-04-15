@@ -25,7 +25,7 @@ provide('isDesktop', isDesktop)
 let activeIndex = 0
 const categoryList = shallowRef<ICategoryItem[]>([]);
 window.ipcRenderer.invoke("get-category-list").then((data: ICategoryItem[]) => {
-    if (data.length) {
+    if (data && data.length) {
         categoryList.value = data
         softwareList.value = categoryList.value[activeIndex].softwareList
     }
@@ -53,8 +53,6 @@ const selectMenu = (index: string) => {
 }
 
 const updateSoftwareList = (list: ISoftware[]) => {
-    console.log(list);
-
     softwareList.value = list
     categoryList.value[activeIndex].softwareList = list
     updateList(categoryList.value)

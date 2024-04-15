@@ -1,6 +1,6 @@
 import { app, BrowserWindow, shell, ipcMain, dialog, Tray, Menu, nativeImage, screen } from 'electron'
 import { release } from 'node:os'
-import { join, dirname, basename, extname } from 'node:path'
+import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ipcHandler from './ipc'
 
@@ -48,6 +48,7 @@ const appTitle = 'Software-box'
 
 export let win: BrowserWindow | null = null
 function createWindow() {
+  Menu.setApplicationMenu(null) // null值取消顶部菜单栏
   win = new BrowserWindow({
     title: 'Main window',
     width: 1400,
@@ -100,10 +101,20 @@ function createWindow() {
     const menu = Menu.buildFromTemplate(template)
     menu.popup({ window: BrowserWindow.fromWebContents(event.sender) })
   })
+
+  // 关闭窗口最小化托盘
+  win.on("close", (event) => {
+    if (!isAppQuit) {
+      win.hide();
+      win.setSkipTaskbar(true);
+      event.preventDefault();
+    }
+  });
 }
 
 // 创建系统托盘
 let tray
+let isAppQuit = false
 function createTray() {
   // 托盘图标
   const icon = nativeImage.createFromPath(appIcon)
@@ -117,7 +128,7 @@ function createTray() {
       }
     },
     { label: '隐藏悬浮球', click: () => { floatingBall.hide() } },
-    { label: '退出', role: 'quit' }
+    { label: '退出', click: () => { isAppQuit = true; app.quit() } }
   ])
   tray.setContextMenu(contextMenu)
   tray.on('click', () => {
@@ -159,11 +170,11 @@ function createFloatingBall() {
   //通过获取用户屏幕的宽高来设置悬浮球的初始位置
   const [screenWidth, screenHeight] = [screen.getPrimaryDisplay().workAreaSize.width, screen.getPrimaryDisplay().workAreaSize.height]
   floatingBall.setPosition(screenWidth - 160, screenHeight - 320) //设置悬浮球位置
-  const routeUrl = 'desktop/floatingBall'
+  const routeUrl = '#/desktop/floatingBall'
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     floatingBall.loadURL(url + routeUrl)
   } else {
-    floatingBall.loadFile(`file://${indexHtml + routeUrl}`)
+    floatingBall.loadFile(indexHtml, { hash: routeUrl })
   }
 
   function setPos(x, y) {
@@ -224,11 +235,11 @@ function createSoftwareDialog() {
     // hasShadow: false, //不显示阴影
   })
 
-  const routeUrl = 'desktop/software-management'
+  const routeUrl = '#/desktop/software-management'
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     softwareDialog.loadURL(url + routeUrl)
   } else {
-    softwareDialog.loadFile(`file://${indexHtml + routeUrl}`)
+    softwareDialog.loadFile(indexHtml, { hash: routeUrl })
   }
 
   softwareDialog.on('blur', () => {
@@ -266,19 +277,35 @@ app.on('activate', () => {
   }
 })
 
-// New window example arg: new windows url
-ipcMain.handle('open-win', (_, arg) => {
-  const childWindow = new BrowserWindow({
-    webPreferences: {
-      preload,
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  })
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${url}#${arg}`)
-  } else {
-    childWindow.loadFile(indexHtml, { hash: arg })
-  }
-})
+//禁止程序多开
+const gotTheLock = app.requestSingleInstanceLock()
+if (gotTheLock) {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
+    // 当运行第二个实例时,将会聚焦到win这个窗口
+    if (win) {
+      win.show();
+      win.setSkipTaskbar(false);
+      win.focus();
+    }
+  });
+} else {
+  app.quit()
+}
+
+// New window example arg: new windows url
+// ipcMain.handle('open-win', (_, arg) => {
+//   const childWindow = new BrowserWindow({
+//     webPreferences: {
+//       preload,
+//       nodeIntegration: true,
+//       contextIsolation: false,
+//     },
+//   })
+
+//   if (process.env.VITE_DEV_SERVER_URL) {
+//     childWindow.loadURL(`${url}#${arg}`)
+//   } else {
+//     childWindow.loadFile(indexHtml, { hash: arg })
+//   }
+// })

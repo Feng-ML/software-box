@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { app, nativeImage, shell } from 'electron'
 import { basename, extname, join } from 'node:path'
-import { generateRandomId } from '../../src/utils/common'
+import { generateRandomId } from '../utils/common'
 
 const imageUrl = join(app.getAppPath(), 'src/assets/images/')
 

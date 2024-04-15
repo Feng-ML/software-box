@@ -6,6 +6,7 @@ import electron from 'vite-plugin-electron/simple'
 import pkg from './package.json'
 import path from 'path'
 
+// 自动导入组件
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
