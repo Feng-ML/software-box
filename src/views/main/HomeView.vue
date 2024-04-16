@@ -1,6 +1,7 @@
 <template>
-  <div class="">
+  <div class="background-color">
     <div class="home">
+      <WinTitleBar />
       <div class="home-tabs">
         <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
           <el-tab-pane class="tabs-item" v-for="(item, index) in routeList" :key="item.name" :name="item.path">
@@ -26,6 +27,7 @@
 import { RouterView, useRouter } from 'vue-router'
 import { ref } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
+import WinTitleBar from '@/components/WinTitleBar.vue';
 
 const router = useRouter()
 const activeName = ref('/software-management')
@@ -52,6 +54,8 @@ const handleClick = (tab: TabsPaneContext) => {
 <style lang="scss">
 .home {
   --tabs-height: 40px;
+  --title-bar-height: 40px;
+
   height: 100vh;
   overflow: hidden;
 }
@@ -83,6 +87,6 @@ const handleClick = (tab: TabsPaneContext) => {
 }
 
 .home-container {
-  height: calc(100% - var(--tabs-height));
+  height: calc(100% - var(--tabs-height) - var(--title-bar-height));
 }
 </style>

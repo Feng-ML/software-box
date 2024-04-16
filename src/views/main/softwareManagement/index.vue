@@ -1,5 +1,5 @@
 <template>
-    <main>
+    <main class="background-color">
         <div id="menu">
             <BoxMenu :list="categoryList" @update:list="updateList" @selectMenu="selectMenu" />
         </div>

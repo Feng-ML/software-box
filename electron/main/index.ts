@@ -54,7 +54,7 @@ function createWindow() {
     width: 1400,
     height: 800,
     icon: appIcon,
-    // frame: false,
+    frame: false,
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -102,14 +102,23 @@ function createWindow() {
     menu.popup({ window: BrowserWindow.fromWebContents(event.sender) })
   })
 
-  // 关闭窗口最小化托盘
-  win.on("close", (event) => {
-    if (!isAppQuit) {
-      win.hide();
-      win.setSkipTaskbar(true);
-      event.preventDefault();
+  ipcMain.on('win-tool-click', (e, type) => {
+    switch (type) {
+      case 'mini':
+        win.minimize()
+        break;
+      case 'max':
+        win.isMaximized() ? win.unmaximize() : win.maximize()
+        break;
+      // 关闭窗口最小化托盘
+      case 'close':
+        win.hide();
+        win.setSkipTaskbar(true);
+        break;
+      default:
+        break;
     }
-  });
+  })
 }
 
 // 创建系统托盘
