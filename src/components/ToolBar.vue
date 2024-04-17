@@ -2,6 +2,8 @@
     <div class="tool-bar">
         <div>{{ title }}</div>
 
+        <BasicSearch v-if="searchBtn" @change="emit('search', $event)" />
+
         <div v-if="showBtns">
             <div v-if="!isEdit" class="btns">
                 <el-icon title="设置" size="20" @click="isEdit = !isEdit">
@@ -21,13 +23,19 @@
 </template>
 
 <script lang='ts' setup>
-const emit = defineEmits(['add'])
+import BasicSearch from './BasicSearch.vue';
+
+const emit = defineEmits(['add', 'search'])
 const isEdit = defineModel<boolean>('isEdit')
 defineProps({
     title: String,
     showBtns: {
         type: Boolean,
         default: true
+    },
+    searchBtn: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -41,7 +49,13 @@ const addClick = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 0 20px;
+    height: 50px;
+    flex-shrink: 0;
+
+    .basic-search {
+        margin-left: auto;
+    }
 
     .btns {
         text-align: right;

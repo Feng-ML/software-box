@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { app, nativeImage, shell } from 'electron'
+import { app, nativeImage, shell, dialog } from 'electron'
 import { basename, extname, join } from 'node:path'
 import { generateRandomId } from '../utils/common'
 
@@ -39,16 +39,24 @@ export const getFileDetail = (filePaths: string[] | string) => {
     for (let i = 0; i < filePaths.length; i++) {
         let path = filePaths[i]
         // 处理快捷方式
-        if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
+        try {
+            if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
+        } catch (error) {
+            dialog.showErrorBox('错误', `读取快捷方式失败，请添加文件的原始路径！（${path}）`)
+            continue
+        }
+
         // 判断是否为文件夹
         if (fs.statSync(path).isDirectory()) {
             allPromises.push(Promise.resolve(nativeImage.createFromPath(imageUrl + 'directory.png')))
-            allowPaths.push(filePaths[i])
+            allowPaths.push(path)
             dirIndexs.push(i)
         } else {
             if (/\.(exe|bat|vbs|url)$/i.test(path)) {
                 allPromises.push(app.getFileIcon(path, { size: 'large' }))
-                allowPaths.push(filePaths[i])
+                allowPaths.push(path)
+            } else {
+                dialog.showMessageBox({ type: 'warning', title: '不支持的文件类型', message: `请选择'exe', 'lnk', 'bat', 'vbs', 'url'文件（${path}）` })
             }
         }
     }

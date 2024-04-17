@@ -1,3 +1,5 @@
+import { dialog } from "electron";
+
 // 生成随机Id
 export function generateRandomId(length: number) {
     let result = '';
@@ -9,4 +11,13 @@ export function generateRandomId(length: number) {
     }
 
     return result;
+}
+
+export function tryToDo(fn: Function, errMsg?: string) {
+    try {
+        fn && fn()
+    } catch (error) {
+        console.log(error);
+        dialog.showErrorBox('错误', errMsg || error.message)
+    }
 }

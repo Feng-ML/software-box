@@ -37,6 +37,7 @@ window.ipcRenderer.on("category-list-change", (event, data: ICategoryItem[]) => 
 })
 
 const updateList = (list: ICategoryItem[]) => {
+    console.log(list);
     categoryList.value = []
 
     nextTick(() => {

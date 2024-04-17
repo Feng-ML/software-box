@@ -1,6 +1,7 @@
 <template>
     <div class="software-box" @drop="handleDrop" @dragover="handleDragOver">
-        <ToolBar title="软件" v-model:is-edit="isEdit" :showBtns="!isDesktop && hasMenu" @add="selectFile" />
+        <ToolBar title="软件" v-model:is-edit="isEdit" :showBtns="!isDesktop && hasMenu" searchBtn @add="selectFile"
+            @search="searchSoft" />
 
         <div class="empty" v-if="!list.length">
             <div v-if="isDesktop">请在主页面添加软件</div>
@@ -9,7 +10,7 @@
         </div>
 
         <div class="box-content" ref="boxContentRef">
-            <div v-for="i in list" :key="i.id" class="box-card" @contextmenu="handleContextMenu(i)">
+            <div v-for="i in softList" :key="i.id" class="box-card" @contextmenu="handleContextMenu(i)">
                 <el-popconfirm title="确定删除吗?" @confirm.stop="deleteItem(i.id)">
                     <template #reference>
                         <el-icon v-show="isEdit" class="delete-btn" size="20">
@@ -32,7 +33,7 @@
 </template>
 
 <script lang='ts' setup>
-import { onMounted, ref, watch, inject } from 'vue';
+import { onMounted, ref, watch, inject, computed, watchEffect } from 'vue';
 import type { ISoftware } from "@/interfaces";
 import Sortable from 'sortablejs';
 import ToolBar from '@/components/ToolBar.vue';
@@ -179,6 +180,16 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
     }
 })
 
+// 搜索
+const searchValue = ref('')
+const searchSoft = (value: string) => {
+    searchValue.value = value
+}
+const softList = computed(() => {
+    if (!searchValue.value) return props.list
+    return props.list.filter(item => item.name.includes(searchValue.value))
+})
+
 // 排序拖拽组件
 let boxSortable: any;
 onMounted(() => {
@@ -204,11 +215,12 @@ onMounted(() => {
     })
 })
 
-watch(isEdit, () => {
-    if (isEdit.value) {
-        boxSortable.option('disabled', false)
+// 是否允许拖拽
+watchEffect(() => {
+    if (isEdit.value && !searchValue.value) {
+        boxSortable?.option('disabled', false)
     } else {
-        boxSortable.option('disabled', true)
+        boxSortable?.option('disabled', true)
     }
 })
 
@@ -229,7 +241,7 @@ watch(isEdit, () => {
     gap: 20px;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px;
+    padding: 10px 20px 20px;
 }
 
 // item基础样式

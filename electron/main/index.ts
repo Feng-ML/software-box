@@ -70,7 +70,7 @@ function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     win.loadURL(url)
     // Open devTool if the app is not packaged
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }
@@ -123,7 +123,6 @@ function createWindow() {
 
 // 创建系统托盘
 let tray
-let isAppQuit = false
 function createTray() {
   // 托盘图标
   const icon = nativeImage.createFromPath(appIcon)
@@ -137,7 +136,7 @@ function createTray() {
       }
     },
     { label: '隐藏悬浮球', click: () => { floatingBall.hide() } },
-    { label: '退出', click: () => { isAppQuit = true; app.quit() } }
+    { label: '退出', role: 'quit' }
   ])
   tray.setContextMenu(contextMenu)
   tray.on('click', () => {

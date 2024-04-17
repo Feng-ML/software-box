@@ -15,14 +15,7 @@ body {
 
 // 背景
 .background-color {
-  // background-color: rgb(192, 188, 204);
   background-image: linear-gradient(45deg, rgba(112, 225, 245, 0.3), rgba(255, 209, 148, 0.3));
-  // background-image: radial-gradient(closest-side, #70e1f5, rgba(243, 11, 164, 0)),
-  //   radial-gradient(closest-side, #ffd194, rgba(243, 11, 164, 0));
-  // background-position:
-  //   50vmax -15vmax,
-  //   -50vmax 15vmax;
-  // background-repeat: no-repeat;
 
   &::after {
     content: '';
