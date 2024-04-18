@@ -188,14 +188,6 @@ watch(isEdit, () => {
 </script>
 
 <style scoped lang="scss">
-.el-menu:not(.el-menu--collapse) {
-  width: 200px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: transparent;
-}
-
 .menu-content {
   overflow-y: auto;
   flex: 1;

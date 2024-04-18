@@ -282,6 +282,7 @@ watchEffect(() => {
         top: -5px;
         right: -5px;
         z-index: 1;
+        cursor: pointer;
     }
 }
 

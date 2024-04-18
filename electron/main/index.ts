@@ -3,6 +3,7 @@ import { release } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ipcHandler from './ipc'
+import { saveStore, getStore } from './store'
 
 globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
@@ -40,12 +41,15 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 // Here, you can also use other preload
+const isDevelopment = process.env.NODE_ENV !== "production";
 const preload = join(__dirname, '../preload/index.mjs')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 const appIcon = join(process.env.VITE_PUBLIC, 'favicon.ico')
 const appTitle = 'Software-box'
+let globalSetting: any = getStore('setting') || {}
 
+// 主页面
 export let win: BrowserWindow | null = null
 function createWindow() {
   // Menu.setApplicationMenu(null) // null值取消顶部菜单栏
@@ -54,6 +58,7 @@ function createWindow() {
     width: 1400,
     height: 800,
     icon: appIcon,
+    show: false,
     frame: false,
     webPreferences: {
       preload,
@@ -70,10 +75,14 @@ function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     win.loadURL(url)
     // Open devTool if the app is not packaged
-    // win.webContents.openDevTools()
+    win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }
+
+  win.on("ready-to-show", () => {
+    win.show();
+  });
 
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
@@ -163,6 +172,7 @@ function createFloatingBall() {
     type: 'toolbar',  //创建的窗口类型为工具栏窗口
     frame: false,  //要创建无边框窗口
     resizable: false, //禁止窗口大小缩放
+    show: false,
     maximizable: false,
     minimizable: false,
     webPreferences: {
@@ -184,6 +194,12 @@ function createFloatingBall() {
   } else {
     floatingBall.loadFile(indexHtml, { hash: routeUrl })
   }
+
+  floatingBall.on("ready-to-show", () => {
+    if (globalSetting.isBallShow) {
+      floatingBall.show()
+    }
+  });
 
   function setPos(x, y) {
     // 不用setPosition，因为在Win系统下移动窗口尺寸可能会改变
@@ -255,8 +271,38 @@ function createSoftwareDialog() {
   })
 }
 
+// 监听设置变化
+function settingChange(newValue, oldValue) {
+  if (newValue.isStartup !== oldValue.isStartup) {
+    // if (process.platform === "darwin") {
+    // }
+    app.setLoginItemSettings({
+      openAtLogin: newValue.isStartup,  //是否开机启动
+      openAsHidden: newValue.isStartup  //是否隐藏主窗体，保留托盘位置
+    });
+  }
+
+  if (newValue.isBallShow !== oldValue.isBallShow) {
+    newValue.isBallShow ? floatingBall.show() : floatingBall.hide()
+  }
+
+  if (newValue.isBallAlwaysOnTop !== oldValue.isBallAlwaysOnTop) {
+    floatingBall.setAlwaysOnTop(newValue.isBallAlwaysOnTop, 'status')
+  }
+}
+
 app.whenReady().then(() => {
   ipcHandler()
+  // 全局设置数据
+  ipcMain.on('set-global-setting', (event, data) => {
+    saveStore('setting', data)
+    settingChange(data, globalSetting)
+    globalSetting = data
+  })
+  ipcMain.handle('get-global-setting', () => {
+    return getStore('setting')
+  })
+
   createWindow()
   createTray()
   createFloatingBall()

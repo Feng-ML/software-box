@@ -1,11 +1,12 @@
 import Store from 'electron-store';
 
-const categoryStore = new Store({ name: 'category' });
+// 持久化存储数据
+const appStore = new Store({ name: 'appData' });
 
-export const saveCategoryList = (category) => {
-    categoryStore.set('categoryList', category);
+export const saveStore = (storeName: string, data) => {
+    appStore.set(storeName, data);
 };
 
-export const getCategoryList = () => {
-    return categoryStore.get('categoryList');
+export const getStore = (storeName: string) => {
+    return appStore.get(storeName);
 };

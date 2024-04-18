@@ -39,9 +39,14 @@ const routeList = [
   },
   {
     name: '个人中心',
-    path: '/',
-    icon: 'Avatar',
+    path: '/user',
+    icon: 'User',
   },
+  // {
+  //   name: '自定义设置',
+  //   path: '/setting',
+  //   icon: 'Setting',
+  // },
 ]
 
 const handleClick = (tab: TabsPaneContext) => {

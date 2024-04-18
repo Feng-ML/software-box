@@ -14,6 +14,19 @@ const router = createRouter({
           path: 'software-management',
           name: '软件管理',
           component: () => import('@/views/main/softwareManagement/index.vue')
+        },
+        {
+          path: 'User',
+          name: '个人中心',
+          component: () => import('@/views/main/user/index.vue'),
+          redirect: '/user/setting',
+          children: [
+            {
+              path: 'setting',
+              name: '设置',
+              component: () => import('@/views/main/user/setting/index.vue')
+            },
+          ]
         }
       ]
     },
