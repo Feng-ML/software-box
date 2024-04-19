@@ -1,26 +1,26 @@
 <template>
-  <div class="background-color">
-    <div class="home">
-      <WinTitleBar />
-      <div class="home-tabs">
-        <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-          <el-tab-pane class="tabs-item" v-for="(item, index) in routeList" :key="item.name" :name="item.path">
-            <template #label>
-              <span class="tabs-label">
-                <el-icon class="tabs-icon">
-                  <component :is="item.icon" />
-                </el-icon>
-                <span>{{ item.name }}</span>
-              </span>
-            </template>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-      <div class="home-container">
-        <RouterView />
-      </div>
+  <div class="home">
+    <WinTitleBar />
+    <div class="home-tabs">
+      <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+        <el-tab-pane class="tabs-item" v-for="(item, index) in routeList" :key="item.name" :name="item.path">
+          <template #label>
+            <span class="tabs-label">
+              <el-icon class="tabs-icon">
+                <component :is="item.icon" />
+              </el-icon>
+              <span>{{ item.name }}</span>
+            </span>
+          </template>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+    <div class="home-container">
+      <RouterView />
     </div>
   </div>
+
+  <Background />
 </template>
 
 <script setup lang="ts">
@@ -28,6 +28,7 @@ import { RouterView, useRouter } from 'vue-router'
 import { ref } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
 import WinTitleBar from '@/components/WinTitleBar.vue';
+import Background from '@/components/Background.vue';
 
 const router = useRouter()
 const activeName = ref('/software-management')

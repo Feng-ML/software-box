@@ -4,11 +4,13 @@ import { reactive, toRaw, watch } from "vue";
 const useSettingStore = defineStore("globalSetting", () => {
 
     const setting = reactive({
-        theme: "Sunny",
+        theme: "light",
         isStartup: true,
+        isOpenAtStartup: true,
         isBallShow: true,
         isBallAlwaysOnTop: true,
     })
+
     window.ipcRenderer.invoke("get-global-setting").then((res) => {
         if (res) {
             Object.assign(setting, res)

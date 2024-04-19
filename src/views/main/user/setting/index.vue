@@ -2,20 +2,24 @@
     <div class="setting-page">
         <div class="setting-title">基本设置</div>
         <div class="setting-row">
-            <span>开机启动</span>
-            <el-switch v-model="setting.isStartup" />
-        </div>
-        <div class="setting-row">
             <span>主题</span>
             <el-segmented v-model="setting.theme" :options="options">
                 <template #default="{ item }">
                     <div class="segmented-item">
                         <el-icon size="20">
-                            <component :is="item.value" />
+                            <component :is="item.icon" />
                         </el-icon>
                     </div>
                 </template>
             </el-segmented>
+        </div>
+        <div class="setting-row">
+            <span>开机启动</span>
+            <el-switch v-model="setting.isStartup" />
+        </div>
+        <div class="setting-row">
+            <span>启动打开主窗口</span>
+            <el-switch v-model="setting.isOpenAtStartup" />
         </div>
         <div class="setting-title">悬浮球</div>
         <div class="setting-row">
@@ -23,7 +27,7 @@
             <el-switch v-model="setting.isBallShow" />
         </div>
         <div class="setting-row">
-            <span>是否置顶</span>
+            <span>置顶</span>
             <el-switch v-model="setting.isBallAlwaysOnTop" />
         </div>
     </div>
@@ -31,21 +35,20 @@
 
 <script lang='ts' setup>
 import settingStore from '@/stores/setting';
-import { ref } from 'vue';
 
 const store = settingStore();
-
 const setting = store.setting;
-// console.log(isBallShow);
 
 const options = [
     {
-        label: 'Sunny',
-        value: 'Sunny',
+        label: 'light',
+        value: 'light',
+        icon: 'Sunny',
     },
     {
-        label: 'Moon',
-        value: 'Moon',
+        label: 'dark',
+        value: 'dark',
+        icon: 'Moon',
     },
 ]
 </script>

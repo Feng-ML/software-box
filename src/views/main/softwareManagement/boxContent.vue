@@ -18,7 +18,7 @@
                         </el-icon>
                     </template>
                 </el-popconfirm>
-                <el-tooltip class="box-item" effect="dark" :content="i.name" placement="top">
+                <el-tooltip class="box-item" :content="i.name" placement="top">
                     <el-image draggable="false" style="width: 100%; height: 100%" :src="i.icon"
                         @click="openFile(i.path)" />
                     <!-- <div class="box-name">名称</div> -->
@@ -37,14 +37,12 @@ import { onMounted, ref, watch, inject, computed, watchEffect } from 'vue';
 import type { ISoftware } from "@/interfaces";
 import Sortable from 'sortablejs';
 import ToolBar from '@/components/ToolBar.vue';
-import { ElMessage } from 'element-plus';
 import { throttle } from '@/utils/common';
 import BasicDialog from '@/components/BasicDialog.vue'
 import type { IFormConfigItem } from '@/components/BasicDialog.vue';
 
 // 桌面组件
 const isDesktop = inject('isDesktop')
-
 
 const emit = defineEmits(['update:list'])
 const boxContentRef = ref()

@@ -81,7 +81,7 @@ function createWindow() {
   }
 
   win.on("ready-to-show", () => {
-    win.show();
+    if (globalSetting.isOpenAtStartup) win.show();
   });
 
   // Test actively push message to the Electron-Renderer
@@ -273,12 +273,12 @@ function createSoftwareDialog() {
 
 // 监听设置变化
 function settingChange(newValue, oldValue) {
+  if (newValue.theme !== oldValue.theme) softwareDialog.webContents.send('refresh-page')
+
   if (newValue.isStartup !== oldValue.isStartup) {
-    // if (process.platform === "darwin") {
-    // }
     app.setLoginItemSettings({
       openAtLogin: newValue.isStartup,  //是否开机启动
-      openAsHidden: newValue.isStartup  //是否隐藏主窗体，保留托盘位置
+      openAsHidden: newValue.isOpenAtStartup  //是否隐藏主窗体，保留托盘位置
     });
   }
 

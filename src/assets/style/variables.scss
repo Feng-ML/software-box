@@ -1,37 +1,13 @@
 // @use 'element-plus/theme-chalk/src/index.scss' as *;
 
 :root {
-  --el-color-primary: #0d47a1;
-
+  --el-color-primary: #fea1a1;
   //   --el-text-color-primary: #625442;
 }
-// // types
-// $types: primary, success, warning, danger, error, info;
 
-// // Color
-// $colors: () !default;
-// $colors: map.deep-merge(
-//   (
-//     'white': #ffffff,
-//     'black': #000000,
-//     'primary': (
-//       'base': #409eff,
-//     ),
-//     'success': (
-//       'base': #67c23a,
-//     ),
-//     'warning': (
-//       'base': #e6a23c,
-//     ),
-//     'danger': (
-//       'base': #f56c6c,
-//     ),
-//     'error': (
-//       'base': #f56c6c,
-//     ),
-//     'info': (
-//       'base': #909399,
-//     ),
-//   ),
-//   $colors
-// );
+:root[data-theme='dark'] {
+  --el-bg-color: #000;
+
+  --el-color-primary: #ff9000;
+  --el-text-color-primary: #fff;
+}

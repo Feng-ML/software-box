@@ -32,7 +32,7 @@ export default function () {
     // 软件列表数据
     ipcMain.on('set-category-list', (event, data) => {
         saveStore('categoryList', data)
-        softwareDialog.webContents.send('category-list-change', data)
+        softwareDialog.webContents.send('refresh-page')
     })
     ipcMain.handle('get-category-list', () => {
         return getStore('categoryList')

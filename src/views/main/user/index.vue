@@ -1,5 +1,5 @@
 <template>
-    <div class="background-color">
+    <div class="user-page">
         <el-menu default-active="0" class="el-menu" @select="selectMenu">
 
             <div class="menu-content" ref="elMenuRef">
@@ -41,7 +41,7 @@ const selectMenu = (index: string) => {
 </script>
 
 <style lang="scss" scoped>
-.background-color {
+.user-page {
     height: 100%;
     display: flex;
 }

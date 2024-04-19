@@ -1,5 +1,5 @@
 <template>
-    <main class="background-color">
+    <main>
         <div id="menu">
             <BoxMenu :list="categoryList" @update:list="updateList" @selectMenu="selectMenu" />
         </div>
@@ -8,6 +8,7 @@
             <BoxContent :list="softwareList" :has-menu="!!categoryList.length" @update:list="updateSoftwareList" />
         </div>
     </main>
+    <Background v-if="isDesktop" />
 </template>
 
 <script lang="ts" setup>
@@ -16,6 +17,7 @@ import BoxContent from "./boxContent.vue"
 import { nextTick, ref, shallowRef, provide } from "vue";
 import type { ICategoryItem, ISoftware } from "@/interfaces";
 import { useRoute } from 'vue-router';
+import Background from '@/components/Background.vue';
 
 const route = useRoute()
 // 是否为桌面组件
@@ -32,8 +34,8 @@ window.ipcRenderer.invoke("get-category-list").then((data: ICategoryItem[]) => {
 })
 
 // 刷新软件悬浮框
-window.ipcRenderer.on("category-list-change", (event, data: ICategoryItem[]) => {
-    if (isDesktop) location.reload()
+window.ipcRenderer.on("refresh-page", (event) => {
+    location.reload()
 })
 
 const updateList = (list: ICategoryItem[]) => {
