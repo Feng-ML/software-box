@@ -6,7 +6,7 @@
         <div class="empty" v-if="!list.length">
             <div v-if="isDesktop">请在主页面添加软件</div>
             <div v-else-if="hasMenu">请通过文件拖拽或点击右上角按钮添加软件</div>
-            <div v-else>请先新增分类</div>
+            <div v-else>请先新增分组</div>
         </div>
 
         <div class="box-content" ref="boxContentRef">

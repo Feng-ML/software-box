@@ -1,6 +1,6 @@
 <template>
   <el-menu :default-active="activeIndex" class="el-menu" :collapse="isCollapse" @select="selectMenu">
-    <ToolBar title="分类" v-model:is-edit="isEdit" :show-btns="!isDesktop" @add="openAddFormDialog()" />
+    <ToolBar title="分组" v-model:is-edit="isEdit" :show-btns="!isDesktop" @add="openAddFormDialog()" />
 
     <div class="menu-content" ref="elMenuRef">
       <el-menu-item v-for="(item, index) in list" :key="item.id" :index="index + ''">
@@ -58,18 +58,18 @@ let formType: string
 let formTitle: string
 let formConfig: IFormConfigItem[] = [
   {
-    label: '分类名称',
+    label: '分组名称',
     prop: 'name',
     type: 'input',
-    rules: [{ required: true, message: '请输入分类名称', trigger: 'blur' }],
+    rules: [{ required: true, message: '请输入分组名称', trigger: 'blur' }],
     attrs: {
       maxlength: 10,
-      placeholder: '请输入分类名称',
+      placeholder: '请输入分组名称',
       showWordLimit: true
     }
   },
   {
-    label: '分类图标',
+    label: '分组图标',
     prop: 'icon',
     type: 'icon',
   },
@@ -87,11 +87,11 @@ const openAddFormDialog = (index?: number) => {
   if (typeof index === 'number') {
     formType = 'edit'
     formData = toRaw(props.list[index])
-    formTitle = '编辑分类'
+    formTitle = '编辑分组'
   } else {
     formType = 'add'
     formData = {}
-    formTitle = '新增分类'
+    formTitle = '新增分组'
   }
   dialogVisible.value = true
 }

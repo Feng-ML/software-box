@@ -47,7 +47,12 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 const appIcon = join(process.env.VITE_PUBLIC, 'favicon.ico')
 const appTitle = 'Software-box'
-let globalSetting: any = getStore('setting') || {}
+let globalSetting: any = getStore('setting') || {
+  isAutoStartup: false,
+  isOpenAtStartup: true,
+  isBallShow: true,
+  isBallAlwaysOnTop: true,
+}
 
 // 主页面
 export let win: BrowserWindow | null = null
@@ -165,6 +170,7 @@ function createFloatingBall() {
   const ballSize = 50
   const winWidth = ballSize
   const winHeight = ballSize
+  console.log(globalSetting.isBallAlwaysOnTop);
 
   floatingBall = new BrowserWindow({
     width: winWidth,
@@ -175,13 +181,14 @@ function createFloatingBall() {
     show: false,
     maximizable: false,
     minimizable: false,
+    acceptFirstMouse: true,
     webPreferences: {
       preload,
       devTools: false //关闭调试工具
     },
     transparent: true, //设置透明
     hasShadow: false, //不显示阴影
-    alwaysOnTop: true, //窗口是否总是显示在其他窗口之前
+    alwaysOnTop: globalSetting.isBallAlwaysOnTop, //窗口是否总是显示在其他窗口之前
     // backgroundColor: '#eee',
   })
 
@@ -205,10 +212,6 @@ function createFloatingBall() {
     // 不用setPosition，因为在Win系统下移动窗口尺寸可能会改变
     floatingBall.setBounds({ x, y, width: winWidth, height: winHeight })
   }
-
-  floatingBall.on('close', () => {
-    floatingBall = null
-  })
 
   ipcMain.on('ball-move', (e, { x, y }) => {
     setPos(x, y)
@@ -235,6 +238,14 @@ function createFloatingBall() {
     const leftPos = left < screenWidth / 2 ? left + winWidth + 30 : left - 630
     softwareDialog.setPosition(leftPos, top - 50)
     softwareDialog.show()
+  })
+
+  ipcMain.on('ball-leave', () => {
+    softwareDialog.hide()
+  })
+
+  floatingBall.on('close', () => {
+    floatingBall = null
   })
 }
 
@@ -275,9 +286,9 @@ function createSoftwareDialog() {
 function settingChange(newValue, oldValue) {
   if (newValue.theme !== oldValue.theme) softwareDialog.webContents.send('refresh-page')
 
-  if (newValue.isStartup !== oldValue.isStartup) {
+  if (newValue.isAutoStartup !== oldValue.isAutoStartup) {
     app.setLoginItemSettings({
-      openAtLogin: newValue.isStartup,  //是否开机启动
+      openAtLogin: newValue.isAutoStartup,  //是否开机启动
       openAsHidden: newValue.isOpenAtStartup  //是否隐藏主窗体，保留托盘位置
     });
   }

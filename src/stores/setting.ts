@@ -5,7 +5,7 @@ const useSettingStore = defineStore("globalSetting", () => {
 
     const setting = reactive({
         theme: "light",
-        isStartup: true,
+        isAutoStartup: false,
         isOpenAtStartup: true,
         isBallShow: true,
         isBallAlwaysOnTop: true,

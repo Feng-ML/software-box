@@ -15,7 +15,7 @@
         </div>
         <div class="setting-row">
             <span>开机启动</span>
-            <el-switch v-model="setting.isStartup" />
+            <el-switch v-model="setting.isAutoStartup" />
         </div>
         <div class="setting-row">
             <span>启动打开主窗口</span>

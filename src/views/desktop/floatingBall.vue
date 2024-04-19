@@ -1,5 +1,5 @@
 <template>
-    <div id="ballWin" @mousedown="mousedown">
+    <div id="ballWin" @click="ballClick" @mousedown="mousedown">
         <div class="ballBox" draggable="false" :class="aside">
             <div class="background-circle"></div>
             <div class="up-circle"></div>
@@ -36,13 +36,30 @@ const mousedown = (e: any) => {
         }
     };
     document.onmouseup = (ev) => {
-        // 点击事件(窗口聚焦首次点击不生效)
-        if (!ismoving && isMouseDown) window.ipcRenderer.send('ball-click')
-        ismoving = false
-        isMouseDown = false
+        setTimeout(() => {
+            ismoving = false
+            isMouseDown = false
+        }, 10)
         window.ipcRenderer.send('ball-moved')
     };
 }
+
+const ballClick = () => {
+    if (!ismoving) {
+        window.ipcRenderer.send('ball-click')
+    }
+}
+
+// const onmousemove = () => {
+//     if (!ismoving) {
+//         window.ipcRenderer.send('ball-click')
+//     }
+// }
+// const onmouseleave = () => {
+//     if (!ismoving) {
+//         window.ipcRenderer.send('ball-leave')
+//     }
+// }
 </script>
 
 <style lang="scss" scoped>
