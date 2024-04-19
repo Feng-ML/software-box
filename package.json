@@ -1,6 +1,6 @@
 {
   "name": "software-box",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "Really simple Electron + Vue + Vite boilerplate.",
   "private": true,
