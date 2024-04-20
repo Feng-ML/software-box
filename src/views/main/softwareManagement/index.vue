@@ -39,7 +39,6 @@ window.ipcRenderer.on("refresh-page", (event) => {
 })
 
 const updateList = (list: ICategoryItem[]) => {
-    console.log(list);
     categoryList.value = []
 
     nextTick(() => {
@@ -56,6 +55,7 @@ const selectMenu = (index: string) => {
 }
 
 const updateSoftwareList = (list: ISoftware[]) => {
+    console.log(list);
     softwareList.value = list
     categoryList.value[activeIndex].softwareList = list
     updateList(categoryList.value)

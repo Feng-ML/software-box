@@ -43,6 +43,7 @@ export const getFileDetail = (filePaths: string[] | string) => {
             if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
         } catch (error) {
             dialog.showErrorBox('错误', `读取快捷方式失败，请添加文件的原始路径！（${path}）`)
+            console.log(error);
             continue
         }
 

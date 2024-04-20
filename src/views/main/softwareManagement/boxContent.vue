@@ -1,7 +1,7 @@
 <template>
     <div class="software-box" @drop="handleDrop" @dragover="handleDragOver">
-        <ToolBar title="软件" v-model:is-edit="isEdit" :showBtns="!isDesktop && hasMenu" searchBtn @add="selectFile"
-            @search="searchSoft" />
+        <ToolBar title="软件" v-model:is-edit="isEdit" :showBtns="!isDesktop && hasMenu" searchBtn
+            @add="selectFile('file')" @search="searchSoft" />
 
         <div class="empty" v-if="!list.length">
             <div v-if="isDesktop">请在主页面添加软件</div>
@@ -27,19 +27,39 @@
             <!-- <div v-for="i in 150" class="box-card"><el-image style="width: 100%; height: 100%" /></div> -->
         </div>
 
-        <BasicDialog title="图标设置" v-model="dialogVisible" form-type="edit" :form-data="formData" width="500"
-            :form-config="formConfig" @submit="formSubmit" />
+        <BasicDialog title="图标设置" v-model="dialogVisible" width="500" @submit="formSubmit">
+            <template #content>
+                <el-form ref="formRef" :model="formData" :rules="formRules" label-width="auto">
+                    <div class="img-is-select" @click="imgSelect">
+                        <img v-if="formData.icon" :src="formData.icon" />
+                        <img v-else src="@/assets/images/Bartender.png" alt="">
+                    </div>
+
+                    <el-form-item label="名称" prop="name">
+                        <el-input v-model="formData.name" placeholder="请输入图标名称" />
+                    </el-form-item>
+                    <el-form-item label="路径" prop="path">
+                        <div class="flex-center">
+                            <el-input v-model="formData.path" placeholder="请输入启动路径" />
+                            <el-button type="primary" @click="selectFile('path')">选择路径</el-button>
+                        </div>
+                    </el-form-item>
+                </el-form>
+            </template>
+        </BasicDialog>
     </div>
 </template>
 
 <script lang='ts' setup>
-import { onMounted, ref, watch, inject, computed, watchEffect } from 'vue';
+import { onMounted, ref, watch, inject, computed, watchEffect, reactive, toRaw } from 'vue';
 import type { ISoftware } from "@/interfaces";
 import Sortable from 'sortablejs';
 import ToolBar from '@/components/ToolBar.vue';
 import { throttle } from '@/utils/common';
 import BasicDialog from '@/components/BasicDialog.vue'
 import type { IFormConfigItem } from '@/components/BasicDialog.vue';
+import { ElMessage } from 'element-plus';
+import type { FormInstance } from 'element-plus'
 
 // 桌面组件
 const isDesktop = inject('isDesktop')
@@ -69,17 +89,20 @@ const addItem = (file: any) => {
     emit('update:list', list)
 }
 
-const selectFile = async () => {
+const selectFile = async (type: string) => {
     const options = {
+        type,
         filters: [
             { name: 'software', extensions: ['exe', 'lnk', 'bat', 'vbs', 'url'] }
         ]
     }
     window.ipcRenderer.invoke('dialog:openFile', options).then(file => {
         console.log(file);
-        if (file) {
-            addItem(file)
-        }
+        if (!file) return
+
+        if (type === 'path') formData.path = file[0]
+        if (type === 'file') addItem(file)
+
     })
 }
 
@@ -107,37 +130,50 @@ const handleDragOver = (e: any) => {
 }
 
 // 修改
+const formRef = ref<FormInstance>()
 const dialogVisible = ref(false)
-let formData: object
-let formConfig: IFormConfigItem[] = [
-    {
-        label: '图标',
-        prop: 'icon',
-        type: 'img',
-    },
-    {
-        label: '名称',
-        prop: 'name',
-        type: 'input',
-        rules: [{ required: true, message: '图标名称不能为空', trigger: 'blur' }],
-        attrs: {
-            placeholder: '请输入图标名称',
+const formData: {
+    id: string,
+    name: string,
+    path: string,
+    icon: string,
+} = reactive({
+    id: '',
+    name: '',
+    path: '',
+    icon: '',
+})
+const formRules = {
+    name: [
+        { required: true, message: '图标名称不能为空', trigger: 'blur' },
+    ],
+    path: [
+        { required: true, message: '启动路径不能为空', trigger: 'blur' },
+    ],
+}
+
+// 图片选择
+const imgSelect = () => {
+    const options = {
+        type: 'image',
+        filters: [
+            { name: 'image', extensions: ['bmp', 'jpg', 'png', 'gif', 'ico', 'svg', 'jpeg'] },
+        ]
+    }
+    window.ipcRenderer.invoke('dialog:openFile', options).then(files => {
+        if (files) {
+            const imgDetail = files[0]
+            const isLt2M = imgDetail.info.size / 1024 / 1024 < 2;
+            if (!isLt2M) return ElMessage.error('图片大小不能超过 2MB!');
+            formData.icon = imgDetail.img.toDataURL()
         }
-    },
-    {
-        label: '路径',
-        prop: 'path',
-        type: 'input',
-        rules: [{ required: true, message: '启动路径不能为空', trigger: 'blur' }],
-        attrs: {
-            placeholder: '请输入启动路径',
-        }
-    },
-]
-const formSubmit = (data: any) => {
+    })
+}
+
+const formSubmit = () => {
     const list = [...props.list]
-    const index = list.findIndex(item => item.id === data.id)
-    list.splice(index, 1, data)
+    const index = list.findIndex(item => item.id === formData.id)
+    list.splice(index, 1, toRaw(formData))
     emit('update:list', list)
     dialogVisible.value = false
 }
@@ -167,7 +203,8 @@ const handleContextMenu = (item: ISoftware) => {
 window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
     switch (command) {
         case '修改':
-            formData = selectItem
+            formRef.value?.resetFields()
+            Object.assign(formData, selectItem)
             dialogVisible.value = true
             break;
         case '删除':
@@ -291,5 +328,26 @@ watchEffect(() => {
 .sortable-ghost {
     border: 2px dashed var(--el-color-primary);
     opacity: 0.5;
+}
+
+.flex-center {
+    flex-grow: 1;
+
+    .el-button {
+        margin-left: 12px;
+    }
+}
+
+.img-is-select {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    cursor: pointer;
+    margin: auto;
+    margin-bottom: 20px;
+
+    img {
+        width: 100%;
+    }
 }
 </style>

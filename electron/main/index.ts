@@ -64,6 +64,7 @@ function createWindow() {
     height: 800,
     icon: appIcon,
     show: false,
+    maximizable: false,
     frame: false,
     webPreferences: {
       preload,

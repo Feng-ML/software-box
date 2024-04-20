@@ -1,28 +1,24 @@
 <template>
     <el-dialog v-model="model" :before-close="closeDialog">
-        <div v-if="formConfig">
-            <el-form ref="formRef" :model="form" :rules="formRules" label-width="auto">
-                <div v-for="item in formConfig">
-                    <div v-if="item.type === 'img'" class="img-is-select" @click="imgSelect">
-                        <img v-if="form[item.prop]" :src="form[item.prop]" />
-                        <img v-else src="@/assets/images/Bartender.png" alt="">
+        <slot name="content">
+            <div v-if="formConfig">
+                <el-form ref="formRef" :model="form" :rules="formRules" label-width="auto">
+                    <div v-for="item in formConfig">
+                        <el-form-item :key="item.prop" :label="item.label" :prop="item.prop">
+                            <el-input v-if="item.type === 'input'" v-model="form[item.prop]"
+                                v-bind="item.attrs || {}" />
+
+                            <div v-if="item.type === 'icon'" class="icon-is-select">
+                                <el-icon @click="iconSelectDialogOpen">
+                                    <component :is="form[item.prop]" />
+                                </el-icon>
+                            </div>
+                        </el-form-item>
                     </div>
-
-                    <el-form-item v-else :key="item.prop" :label="item.label" :prop="item.prop">
-
-                        <el-input v-if="item.type === 'input'" v-model="form[item.prop]" v-bind="item.attrs || {}" />
-
-                        <div v-if="item.type === 'icon'" class="icon-is-select">
-                            <el-icon @click="iconSelectDialogOpen">
-                                <component :is="form[item.prop]" />
-                            </el-icon>
-                        </div>
-
-                    </el-form-item>
-                </div>
-            </el-form>
-            <IconSelect ref="iconSelectRef" @select="iconSelect" />
-        </div>
+                </el-form>
+                <IconSelect ref="iconSelectRef" @select="iconSelect" />
+            </div>
+        </slot>
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="closeDialog">取消</el-button>
@@ -77,7 +73,6 @@ watch(model, (newVal) => {
             props.formConfig.forEach(item => {
                 if (item.rules) formRules[item.prop] = item.rules
                 if (item.type === 'icon') iconAttrName = item.prop
-                if (item.type === 'img') imgAttrName = item.prop
             })
             // 默认添加图标
             if (props.formType === "add" && iconAttrName) {
@@ -106,31 +101,12 @@ const iconSelect = (name: string) => {
     form[iconAttrName] = name
 }
 
-// 图片选择
-let imgAttrName = ''
-const imgSelect = () => {
-    const options = {
-        type: 'image',
-        filters: [
-            { name: 'image', extensions: ['bmp', 'jpg', 'png', 'gif', 'ico', 'svg', 'jpeg'] },
-        ]
-    }
-    window.ipcRenderer.invoke('dialog:openFile', options).then(files => {
-        if (files) {
-            const imgDetail = files[0]
-            const isLt2M = imgDetail.info.size / 1024 / 1024 < 2;
-            if (!isLt2M) return ElMessage.error('图片大小不能超过 2MB!');
-            form[imgAttrName] = imgDetail.img.toDataURL()
-        }
-    })
-}
-
 const closeDialog = () => {
     model.value = false
 }
 
 const formConfirm = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return
+    if (!formEl) return emit('submit')
     await formEl.validate((valid, fields) => {
         if (valid) {
             emit('submit', toRaw(form))
@@ -149,18 +125,5 @@ const formConfirm = async (formEl: FormInstance | undefined) => {
     display: flex;
     align-items: center;
     cursor: pointer;
-}
-
-.img-is-select {
-    width: 100px;
-    height: 100px;
-    overflow: hidden;
-    cursor: pointer;
-    margin: auto;
-    margin-bottom: 20px;
-
-    img {
-        width: 100%;
-    }
 }
 </style>

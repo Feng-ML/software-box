@@ -3,8 +3,10 @@
 }
 
 // 菜单样式
-.el-menu:not(.el-menu--collapse) {
-  width: 200px;
+.el-menu {
   height: 100%;
-  background: transparent;
+  background-color: transparent !important;
+  &:not(.el-menu--collapse) {
+    width: 150px;
+  }
 }

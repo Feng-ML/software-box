@@ -5,9 +5,9 @@
             <el-icon @click="winToolClick('mini')">
                 <SemiSelect />
             </el-icon>
-            <el-icon @click="winToolClick('max')">
+            <!-- <el-icon @click="winToolClick('max')">
                 <FullScreen />
-            </el-icon>
+            </el-icon> -->
             <el-icon @click="winToolClick('close')">
                 <CloseBold />
             </el-icon>

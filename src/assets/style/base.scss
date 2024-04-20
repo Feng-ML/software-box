@@ -25,6 +25,12 @@ body {
 }
 //====================//
 
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .empty {
   text-align: center;
   color: var(--el-color-info);

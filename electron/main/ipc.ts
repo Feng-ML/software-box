@@ -15,7 +15,8 @@ export default function () {
 
         if (!canceled) {
             if (options.type === 'image') return getImageDetail(filePaths)
-            return getFileDetail(filePaths)
+            if (options.type === 'file') return getFileDetail(filePaths)
+            return filePaths
         }
     })
 
