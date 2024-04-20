@@ -1,23 +1,16 @@
 <template>
     <div class="user-page">
-        <el-menu default-active="0" class="el-menu" @select="selectMenu">
+        <BasicMenu :list="menuList" @menuClick="selectMenu" />
 
-            <div class="menu-content" ref="elMenuRef">
-                <el-menu-item v-for="(item, index) in menuList" :key="index" :index="index + ''">
-                    <el-icon>
-                        <component :is="item.icon" />
-                    </el-icon>
-                    <div class="menu-item-name">{{ item.name }}</div>
-                </el-menu-item>
-            </div>
-        </el-menu>
-
-        <RouterView />
+        <div class="user-content">
+            <RouterView />
+        </div>
     </div>
 </template>
 
 <script lang='ts' setup>
 import { RouterView, useRouter } from 'vue-router';
+import BasicMenu from '@/components/BasicMenu.vue';
 
 const router = useRouter()
 const menuList = [
@@ -32,8 +25,8 @@ const menuList = [
     }
 ]
 
-const selectMenu = (index: string) => {
-    const path = menuList[Number(index)].path
+const selectMenu = (index: number) => {
+    const path = menuList[index].path
     if (path) {
         router.push(path)
     }
@@ -46,7 +39,9 @@ const selectMenu = (index: string) => {
     display: flex;
 }
 
-.el-menu {
-    flex-shrink: 0;
+.user-content {
+    flex: 1;
+    padding: 12px;
+    padding-left: 0;
 }
 </style>

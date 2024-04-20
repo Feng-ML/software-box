@@ -183,14 +183,13 @@ function createFloatingBall() {
     maximizable: false,
     minimizable: false,
     acceptFirstMouse: true,
+    transparent: true, //设置透明
+    hasShadow: false, //不显示阴影
+    alwaysOnTop: globalSetting.isBallAlwaysOnTop, //窗口是否总是显示在其他窗口之前
     webPreferences: {
       preload,
       devTools: false //关闭调试工具
     },
-    transparent: true, //设置透明
-    hasShadow: false, //不显示阴影
-    alwaysOnTop: globalSetting.isBallAlwaysOnTop, //窗口是否总是显示在其他窗口之前
-    // backgroundColor: '#eee',
   })
 
   //通过获取用户屏幕的宽高来设置悬浮球的初始位置
@@ -263,12 +262,12 @@ function createSoftwareDialog() {
     minimizable: false,
     alwaysOnTop: true, //窗口是否总是显示在其他窗口之前
     skipTaskbar: true,
+    transparent: true, //设置透明
+    hasShadow: false, //不显示阴影
     webPreferences: {
       preload,
       devTools: false //关闭调试工具
     }
-    // transparent: true, //设置透明
-    // hasShadow: false, //不显示阴影
   })
 
   const routeUrl = '#/desktop/software-management'

@@ -1,7 +1,7 @@
 <template>
-    <div class="software-box" @drop="handleDrop" @dragover="handleDragOver">
-        <ToolBar title="软件" v-model:is-edit="isEdit" :showBtns="!isDesktop && hasMenu" searchBtn
-            @add="selectFile('file')" @search="searchSoft" />
+    <div class="card software-box" @drop="handleDrop" @dragover="handleDragOver">
+        <ToolBar title="" v-model:is-edit="isEdit" :showBtns="!isDesktop && hasMenu" searchBtn @add="selectFile('file')"
+            @search="searchSoft" />
 
         <div class="empty" v-if="!list.length">
             <div v-if="isDesktop">请在主页面添加软件</div>

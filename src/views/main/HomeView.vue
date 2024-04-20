@@ -63,7 +63,8 @@ const handleClick = (tab: TabsPaneContext) => {
   --title-bar-height: 40px;
 
   height: 100vh;
-  overflow: hidden;
+  width: 100vw;
+  // overflow: hidden;
 }
 
 .home-tabs {

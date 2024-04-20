@@ -1,18 +1,20 @@
 <template>
     <main>
         <div id="menu">
-            <BoxMenu :list="categoryList" @update:list="updateList" @selectMenu="selectMenu" />
+            <!-- <BoxMenu :list="categoryList" @update:list="updateList" @selectMenu="selectMenu" /> -->
+            <BasicMenu :list="categoryList" @menuClick="selectMenu" />
         </div>
 
         <div id="content">
             <BoxContent :list="softwareList" :has-menu="!!categoryList.length" @update:list="updateSoftwareList" />
         </div>
     </main>
-    <Background v-if="isDesktop" />
+    <!-- <Background v-if="isDesktop" /> -->
 </template>
 
 <script lang="ts" setup>
 import BoxMenu from "./boxMenu.vue"
+import BasicMenu from '@/components/BasicMenu.vue';
 import BoxContent from "./boxContent.vue"
 import { nextTick, ref, shallowRef, provide } from "vue";
 import type { ICategoryItem, ISoftware } from "@/interfaces";
@@ -49,8 +51,8 @@ const updateList = (list: ICategoryItem[]) => {
 
 // 软件列表
 const softwareList = shallowRef<ISoftware[]>([])
-const selectMenu = (index: string) => {
-    activeIndex = Number(index)
+const selectMenu = (index: number) => {
+    activeIndex = index
     softwareList.value = categoryList.value[activeIndex]?.softwareList
 }
 
@@ -73,5 +75,7 @@ main {
 
 #content {
     flex: 1;
+    padding: 12px;
+    padding-left: 0;
 }
 </style>

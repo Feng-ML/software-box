@@ -1,5 +1,5 @@
 <template>
-    <div class="setting-page">
+    <div class="card setting-page">
         <div class="setting-title">基本设置</div>
         <div class="setting-row">
             <span>主题</span>
@@ -56,7 +56,6 @@ const options = [
 <style lang="scss">
 .setting-page {
     padding: 20px;
-    width: 100%;
 
     .setting-title {
         font-size: var(--el-font-size-large);
