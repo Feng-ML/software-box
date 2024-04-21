@@ -1,21 +1,11 @@
 <template>
   <div class="home">
     <WinTitleBar />
-    <div class="home-tabs">
-      <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-        <el-tab-pane class="tabs-item" v-for="(item, index) in routeList" :key="item.name" :name="item.path">
-          <template #label>
-            <span class="tabs-label">
-              <el-icon class="tabs-icon">
-                <component :is="item.icon" />
-              </el-icon>
-              <span>{{ item.name }}</span>
-            </span>
-          </template>
-        </el-tab-pane>
-      </el-tabs>
-    </div>
+
     <div class="home-container">
+      <div class="home-menu">
+        <BasicMenu :list="routeList" @menuClick="selectMenu" />
+      </div>
       <RouterView />
     </div>
   </div>
@@ -25,75 +15,40 @@
 
 <script setup lang="ts">
 import { RouterView, useRouter } from 'vue-router'
-import { ref } from 'vue'
-import type { TabsPaneContext } from 'element-plus'
-import WinTitleBar from '@/components/WinTitleBar.vue';
-import Background from '@/components/Background.vue';
+import WinTitleBar from '@/components/WinTitleBar.vue'
+import Background from '@/components/Background.vue'
+import BasicMenu from '@/components/BasicMenu.vue'
 
 const router = useRouter()
-const activeName = ref('/software-management')
 const routeList = [
   {
     name: '软件管理',
     path: '/software-management',
-    icon: 'memo',
+    icon: 'memo'
   },
   {
-    name: '个人中心',
-    path: '/user',
-    icon: 'User',
-  },
-  // {
-  //   name: '自定义设置',
-  //   path: '/setting',
-  //   icon: 'Setting',
-  // },
+    name: '自定义设置',
+    path: '/setting',
+    icon: 'Tools'
+  }
 ]
 
-const handleClick = (tab: TabsPaneContext) => {
-  console.log(tab.paneName);
-
-  router.push(tab.paneName as string || "/")
+const selectMenu = (index: number) => {
+  router.push(routeList[index].path || '/')
 }
 </script>
 
 <style lang="scss">
 .home {
-  --tabs-height: 40px;
-  --title-bar-height: 40px;
+  --title-bar-height: 60px;
 
   height: 100vh;
   width: 100vw;
   // overflow: hidden;
 }
 
-.home-tabs {
-  height: var(--tabs-height);
-
-  .el-tabs__item {
-    padding: 5px;
-  }
-
-  .el-tabs__item.is-top:nth-child(2) {
-    padding-left: 20px;
-  }
-
-  .el-tabs__header {
-    margin: 0;
-  }
-
-  .tabs-label {
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
-  }
-
-  .tabs-icon {
-    margin-right: 5px;
-  }
-}
-
 .home-container {
-  height: calc(100% - var(--tabs-height) - var(--title-bar-height));
+  height: calc(100% - var(--title-bar-height));
+  display: flex;
 }
 </style>

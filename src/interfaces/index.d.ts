@@ -9,6 +9,5 @@ declare type ISoftware = {
 export declare type ICategoryItem = {
     id: string;
     name: string;
-    icon: string;
     softwareList: Array<ISoftware>;
 }

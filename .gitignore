@@ -18,6 +18,7 @@ release
 .vscode/.debug.env
 .idea
 .DS_Store
+.vscode
 *.suo
 *.ntvs*
 *.njsproj

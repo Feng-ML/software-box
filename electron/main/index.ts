@@ -171,7 +171,6 @@ function createFloatingBall() {
   const ballSize = 50
   const winWidth = ballSize
   const winHeight = ballSize
-  console.log(globalSetting.isBallAlwaysOnTop);
 
   floatingBall = new BrowserWindow({
     width: winWidth,
