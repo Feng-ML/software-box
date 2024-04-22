@@ -9,6 +9,7 @@
       @add="selectFile('file')"
       @search="searchSoft"
       @addTag="addCategory"
+      @editTag="editCategory"
       @deleteTag="deleteCategory"
     />
 
@@ -20,13 +21,9 @@
 
     <div class="box-content" ref="boxContentRef">
       <div v-for="i in softList" :key="i.id" class="box-card" @contextmenu="handleContextMenu(i)">
-        <el-popconfirm title="确定删除吗?" @confirm.stop="deleteItem(i.id)">
-          <template #reference>
-            <el-icon v-show="isEdit" class="delete-btn" size="20">
-              <RemoveFilled />
-            </el-icon>
-          </template>
-        </el-popconfirm>
+        <el-icon v-show="isEdit" class="delete-btn" size="20" @click.stop="deleteItem(i.id)">
+          <RemoveFilled />
+        </el-icon>
         <el-tooltip class="box-item" :content="i.name" placement="top">
           <el-image
             draggable="false"
@@ -64,7 +61,17 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, computed, watchEffect, reactive, toRaw, shallowRef } from 'vue'
+import {
+  onMounted,
+  ref,
+  watch,
+  computed,
+  watchEffect,
+  reactive,
+  toRaw,
+  shallowRef,
+  provide
+} from 'vue'
 import type { ICategoryItem, ISoftware } from '@/interfaces'
 import Sortable from 'sortablejs'
 import ToolBar from './ToolBar.vue'
@@ -77,6 +84,7 @@ import { useRoute } from 'vue-router'
 // 是否为桌面组件
 const route = useRoute()
 const isDesktop = route.fullPath.includes('desktop')
+provide('isDesktop', isDesktop)
 
 const emit = defineEmits(['update:list'])
 const boxContentRef = ref()
@@ -123,10 +131,19 @@ const addCategory = (name: string) => {
   saveData()
 }
 
+// 编辑分组
+const editCategory = (index: number, name: string) => {
+  categoryList.value[index].name = name
+  saveData()
+}
+
 // 删除分组
 const deleteCategory = (index: number) => {
   categoryList.value.splice(index, 1)
   saveData()
+  if (index === activeIndex.value) {
+    activeIndex.value = 0
+  }
 }
 
 const addItem = (file: any) => {
@@ -243,17 +260,21 @@ let selectItem: ISoftware
 const handleContextMenu = (item: ISoftware) => {
   if (!isDesktop) {
     selectItem = item
-    window.ipcRenderer.send('show-context-menu')
+    const menuList = [
+      { label: '图标设置', value: 'icon-set' },
+      { label: '图标删除', value: 'icon-delete' }
+    ]
+    window.ipcRenderer.send('show-context-menu', menuList)
   }
 }
 window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
   switch (command) {
-    case '修改':
+    case 'icon-set':
       formRef.value?.resetFields()
       Object.assign(formData, selectItem)
       dialogVisible.value = true
       break
-    case '删除':
+    case 'icon-delete':
       selectItem && deleteItem(selectItem.id)
       break
     default:
@@ -303,6 +324,7 @@ watchEffect(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-height: calc(100vh - 24px);
 }
 
 .box-content {
@@ -311,7 +333,7 @@ watchEffect(() => {
   gap: 20px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 10px 20px 20px;
+  padding: 2px 20px 20px;
 }
 
 // item基础样式

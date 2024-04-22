@@ -102,17 +102,13 @@ function createWindow() {
   })
 
   // 右键菜单
-  ipcMain.on('show-context-menu', (event) => {
-    const template = [
-      {
-        label: '图标设置',
-        click: () => { event.sender.send('context-menu-command', '修改') }
-      },
-      {
-        label: '图标删除',
-        click: () => { event.sender.send('context-menu-command', '删除') }
-      },
-    ]
+  ipcMain.on('show-context-menu', (event, menuList) => {
+    const template = menuList.map(item => {
+      return {
+        label: item.label,
+        click: () => { event.sender.send('context-menu-command', item.value) }
+      }
+    })
     const menu = Menu.buildFromTemplate(template)
     menu.popup({ window: BrowserWindow.fromWebContents(event.sender) })
   })
