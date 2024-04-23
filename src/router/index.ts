@@ -17,8 +17,13 @@ const router = createRouter({
         },
         {
           path: 'setting',
-          name: '设置',
+          name: '偏好设置',
           component: () => import('@/views/main/setting/index.vue'),
+        },
+        {
+          path: 'shortcut',
+          name: '快捷键',
+          component: () => import('@/views/main/shortcut/index.vue'),
         }
       ]
     },

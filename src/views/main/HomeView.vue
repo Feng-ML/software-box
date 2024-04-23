@@ -24,12 +24,17 @@ const routeList = [
   {
     name: '软件管理',
     path: '/software-management',
-    icon: 'memo'
+    icon: 'management'
   },
   {
     name: '偏好设置',
     path: '/setting',
-    icon: 'Tools'
+    icon: 'setting'
+  },
+  {
+    name: '快捷键',
+    path: '/shortcut',
+    icon: 'shortcut'
   }
 ]
 
