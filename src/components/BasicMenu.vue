@@ -9,9 +9,7 @@
           :class="{ active: activeIndex == index }"
           @click="menuClick(index)"
         >
-          <el-icon>
-            <component :is="item.icon" />
-          </el-icon>
+          <i class="iconfont" :class="'icon-' + item.icon"></i>
           <span>{{ item.name }}</span>
           <!-- <span>{{ item.name }}</span> -->
         </li>
