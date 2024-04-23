@@ -27,7 +27,7 @@ const routeList = [
     icon: 'memo'
   },
   {
-    name: '自定义设置',
+    name: '偏好设置',
     path: '/setting',
     icon: 'Tools'
   }

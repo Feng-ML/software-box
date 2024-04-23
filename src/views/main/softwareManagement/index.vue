@@ -61,17 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  onMounted,
-  ref,
-  watch,
-  computed,
-  watchEffect,
-  reactive,
-  toRaw,
-  shallowRef,
-  provide
-} from 'vue'
+import { onMounted, ref, computed, watchEffect, reactive, toRaw, provide } from 'vue'
 import type { ICategoryItem, ISoftware } from '@/interfaces'
 import Sortable from 'sortablejs'
 import ToolBar from './ToolBar.vue'
@@ -154,8 +144,8 @@ const addItem = (file: any) => {
 
 const selectFile = async (type: string) => {
   const options = {
-    type,
-    filters: [{ name: 'software', extensions: ['exe', 'lnk', 'bat', 'vbs', 'url'] }]
+    type
+    // filters: [{ name: 'software', extensions: ['exe', 'lnk', 'bat', 'vbs', 'url'] }]
   }
   window.ipcRenderer.invoke('dialog:openFile', options).then((file) => {
     console.log(file)
@@ -324,7 +314,7 @@ watchEffect(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 24px);
+  height: calc(100% - 24px);
 }
 
 .box-content {
@@ -333,7 +323,7 @@ watchEffect(() => {
   gap: 20px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 2px 20px 20px;
+  padding: 12px 20px 20px;
 }
 
 // item基础样式
@@ -352,10 +342,13 @@ watchEffect(() => {
   @extend .card-default;
   position: relative;
 
-  .el-image:hover {
+  .el-image {
     cursor: pointer;
-    transition-duration: 0.3s;
-    transform: scale(1.2);
+    transition: transform 0.3s;
+
+    &:hover {
+      transform: scale(1.4);
+    }
   }
 
   .box-item {

@@ -13,6 +13,7 @@
             <component :is="item.icon" />
           </el-icon>
           <span>{{ item.name }}</span>
+          <!-- <span>{{ item.name }}</span> -->
         </li>
       </ul>
     </div>
@@ -68,7 +69,10 @@ function menuClick(index: number) {
     position: relative;
 
     li {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       width: 55px;
       height: 55px;
       border-radius: 10px;
@@ -76,29 +80,33 @@ function menuClick(index: number) {
       position: relative;
       z-index: 5;
       margin-bottom: 12px;
-      line-height: 68px;
+      // line-height: 68px;
 
       span {
-        display: block;
-        position: absolute;
-        left: 80%;
-        opacity: 0;
-        top: 12px;
-        margin-left: 1rem;
-        color: #fff;
-        background: var(--el-color-primary);
-        transition: 250ms ease all;
-        border-radius: 17.5px;
-        line-height: 0;
-        padding: 16px 15px;
-        white-space: nowrap;
-        pointer-events: none;
+        font-size: 10px;
       }
 
-      &:hover span {
-        left: 100%;
-        opacity: 1;
-      }
+      // span {
+      //   display: block;
+      //   position: absolute;
+      //   left: 80%;
+      //   opacity: 0;
+      //   top: 12px;
+      //   margin-left: 1rem;
+      //   color: #fff;
+      //   background: var(--el-color-primary);
+      //   transition: 250ms ease all;
+      //   border-radius: 17.5px;
+      //   line-height: 0;
+      //   padding: 16px 15px;
+      //   white-space: nowrap;
+      //   pointer-events: none;
+      // }
+
+      // &:hover span {
+      //   left: 100%;
+      //   opacity: 1;
+      // }
     }
   }
 }
@@ -124,7 +132,7 @@ function menuClick(index: number) {
   transition: 250ms;
 }
 
-.active .el-icon {
+.active {
   color: white;
 }
 </style>

@@ -42,7 +42,7 @@ export const getFileDetail = (filePaths: string[] | string) => {
         try {
             if (/\.lnk$/.test(path)) path = shell.readShortcutLink(path).target
         } catch (error) {
-            dialog.showErrorBox('错误', `读取快捷方式失败，请添加文件的原始路径！（${path}）`)
+            dialog.showErrorBox('错误', `读取快捷方式失败，请拖入实际路径的文件或者在右上角设置按钮中添加！（${path}）`)
             console.log(error);
             continue
         }
@@ -53,12 +53,14 @@ export const getFileDetail = (filePaths: string[] | string) => {
             allowPaths.push(path)
             dirIndexs.push(i)
         } else {
-            if (/\.(exe|bat|vbs|url)$/i.test(path)) {
-                allPromises.push(app.getFileIcon(path, { size: 'large' }))
-                allowPaths.push(path)
-            } else {
-                dialog.showMessageBox({ type: 'warning', title: '不支持的文件类型', message: `请选择'exe', 'lnk', 'bat', 'vbs', 'url'文件（${path}）` })
-            }
+            allPromises.push(app.getFileIcon(path, { size: 'large' }))
+            allowPaths.push(path)
+            // if (/\.(exe|bat|vbs|url)$/i.test(path)) {
+            //     allPromises.push(app.getFileIcon(path, { size: 'large' }))
+            //     allowPaths.push(path)
+            // } else {
+            //     dialog.showMessageBox({ type: 'warning', title: '不支持的文件类型', message: `请选择'exe', 'lnk', 'bat', 'vbs', 'url'文件（${path}）` })
+            // }
         }
     }
     return Promise.all(allPromises).then(res => {

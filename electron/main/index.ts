@@ -60,8 +60,8 @@ function createWindow() {
   // Menu.setApplicationMenu(null) // null值取消顶部菜单栏
   win = new BrowserWindow({
     title: 'Main window',
-    width: 1400,
-    height: 800,
+    width: 800,
+    height: 600,
     icon: appIcon,
     show: false,
     maximizable: false,
@@ -81,7 +81,7 @@ function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     win.loadURL(url)
     // Open devTool if the app is not packaged
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }
