@@ -7,6 +7,7 @@ const useSettingStore = defineStore("globalSetting", () => {
         theme: "light",
         isAutoStartup: false,
         isOpenAtStartup: true,
+        isShowTrayIcon: true,
         isBallShow: true,
         isBallAlwaysOnTop: true,
     })

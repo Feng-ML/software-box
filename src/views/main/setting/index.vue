@@ -14,12 +14,16 @@
       </el-segmented>
     </div>
     <div class="setting-row">
-      <span>开机启动</span>
+      <span>开机自动启动</span>
       <el-switch v-model="setting.isAutoStartup" />
     </div>
     <div class="setting-row">
       <span>启动打开主窗口</span>
       <el-switch v-model="setting.isOpenAtStartup" />
+    </div>
+    <div class="setting-row">
+      <span>显示托盘图标</span>
+      <el-switch v-model="setting.isShowTrayIcon" />
     </div>
     <div class="setting-title">悬浮球</div>
     <div class="setting-row">

@@ -50,6 +50,7 @@ const appTitle = 'Software-box'
 let globalSetting: any = getStore('setting') || {
   isAutoStartup: false,
   isOpenAtStartup: true,
+  isShowTrayIcon: true,
   isBallShow: true,
   isBallAlwaysOnTop: true,
 }
@@ -295,22 +296,32 @@ function settingChange(newValue, oldValue) {
   if (newValue.isBallAlwaysOnTop !== oldValue.isBallAlwaysOnTop) {
     floatingBall.setAlwaysOnTop(newValue.isBallAlwaysOnTop, 'status')
   }
+
+  if (newValue.isShowTrayIcon !== oldValue.isShowTrayIcon) {
+    if (newValue.isShowTrayIcon) {
+      createTray()
+    } else {
+      tray && tray.destroy()
+      tray = null
+    }
+  }
 }
+
+// 监听全局设置
+ipcMain.on('set-global-setting', (event, data) => {
+  saveStore('setting', data)
+  settingChange(data, globalSetting)
+  globalSetting = data
+})
+ipcMain.handle('get-global-setting', () => {
+  return getStore('setting')
+})
+
 
 app.whenReady().then(() => {
   ipcHandler()
-  // 全局设置数据
-  ipcMain.on('set-global-setting', (event, data) => {
-    saveStore('setting', data)
-    settingChange(data, globalSetting)
-    globalSetting = data
-  })
-  ipcMain.handle('get-global-setting', () => {
-    return getStore('setting')
-  })
-
   createWindow()
-  createTray()
+  if (globalSetting.isShowTrayIcon) createTray()
   createFloatingBall()
   createSoftwareDialog()
 })
