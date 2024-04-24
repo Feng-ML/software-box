@@ -37,9 +37,9 @@ const router = createRouter({
           component: () => import('@/views/desktop/floatingBall.vue')
         },
         {
-          path: 'software-management',
+          path: 'software-dialog',
           name: '软件管理悬浮',
-          component: () => import('@/views/main/softwareManagement/index.vue')
+          component: () => import('@/views/desktop/softwareDialog.vue')
         }
       ]
     }

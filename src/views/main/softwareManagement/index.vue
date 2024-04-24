@@ -69,12 +69,12 @@ import { throttle, generateRandomId } from '@/utils/common'
 import BasicDialog from '@/components/BasicDialog.vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
-import { useRoute } from 'vue-router'
 
 // 是否为桌面组件
-const route = useRoute()
-const isDesktop = route.fullPath.includes('desktop')
-provide('isDesktop', isDesktop)
+const props = defineProps({
+  isDesktop: Boolean
+})
+provide('isDesktop', props.isDesktop)
 
 const emit = defineEmits(['update:list'])
 const boxContentRef = ref()
@@ -248,7 +248,7 @@ const openFile = throttle(function (path: string) {
 // 右键菜单
 let selectItem: ISoftware
 const handleContextMenu = (item: ISoftware) => {
-  if (!isDesktop) {
+  if (!props.isDesktop) {
     selectItem = item
     const menuList = [
       { label: '图标设置', value: 'icon-set' },

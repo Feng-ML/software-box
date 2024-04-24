@@ -269,7 +269,7 @@ function createSoftwareDialog() {
     }
   })
 
-  const routeUrl = '#/desktop/software-management'
+  const routeUrl = '#/desktop/software-dialog'
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     softwareDialog.loadURL(url + routeUrl)
   } else {
