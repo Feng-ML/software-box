@@ -27,14 +27,10 @@ const shortcutMap = reactive({
   openMainWin: ''
 })
 window.ipcRenderer.invoke('get-global-shortcut').then((res) => {
-  if (res) {
-    Object.assign(shortcutMap, res)
-    console.log(res)
-  }
-})
-
-watch(shortcutMap, (newValue) => {
-  window.ipcRenderer.send('set-global-shortcut', toRaw(newValue))
+  if (res) Object.assign(shortcutMap, res)
+  watch(shortcutMap, (newValue) => {
+    window.ipcRenderer.send('set-global-shortcut', toRaw(newValue))
+  })
 })
 
 let focusInput: string
@@ -76,7 +72,7 @@ onUnmounted(() => {
 
   .el-input,
   .el-input__icon,
-  .el-input__wrapper,
+  :deep .el-input__wrapper,
   :deep input {
     cursor: pointer !important;
   }

@@ -1,9 +1,10 @@
-import { app, BrowserWindow, shell, ipcMain, dialog, Tray, Menu, nativeImage, screen } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, dialog, Tray, Menu, nativeImage, screen, globalShortcut } from 'electron'
 import { release } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ipcHandler from './ipc'
 import { saveStore, getStore } from './store'
+import { shortcutInit } from './shortcut'
 
 globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
@@ -132,6 +133,16 @@ function createWindow() {
     }
   })
 }
+export function showOrHideWin() {
+  if (!win) return
+  if (win.isVisible()) {
+    win.hide()
+    win.setSkipTaskbar(true);
+  } else {
+    win.show()
+    win.setSkipTaskbar(false);
+  }
+}
 
 // 创建系统托盘
 let tray
@@ -151,15 +162,7 @@ function createTray() {
     { label: '退出', role: 'quit' }
   ])
   tray.setContextMenu(contextMenu)
-  tray.on('click', () => {
-    if (win.isVisible()) {
-      win.hide()
-      win.setSkipTaskbar(true);
-    } else {
-      win.show()
-      win.setSkipTaskbar(false);
-    }
-  })
+  tray.on('click', showOrHideWin)
 }
 
 // 创建悬浮球
@@ -319,6 +322,7 @@ ipcMain.handle('get-global-setting', () => {
 
 
 app.whenReady().then(() => {
+  shortcutInit()
   ipcHandler()
   createWindow()
   if (globalSetting.isShowTrayIcon) createTray()
@@ -328,6 +332,7 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   win = null
+  globalShortcut.unregisterAll()
   if (process.platform !== 'darwin') app.quit()
 })
 
