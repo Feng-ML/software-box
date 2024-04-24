@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import ipcHandler from './ipc'
 import { saveStore, getStore } from './store'
 import { shortcutInit } from './shortcut'
+import type { ISetting } from '~/types/globalTypes'
 
 globalThis.__filename = fileURLToPath(import.meta.url)
 globalThis.__dirname = dirname(__filename)
@@ -48,7 +49,8 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 const appIcon = join(process.env.VITE_PUBLIC, 'favicon.ico')
 const appTitle = 'Software-box'
-let globalSetting: any = getStore('setting') || {
+let globalSetting: ISetting = getStore('setting') as ISetting || {
+  theme: "light",
   isAutoStartup: false,
   isOpenAtStartup: true,
   isShowTrayIcon: true,
@@ -152,13 +154,7 @@ function createTray() {
   tray = new Tray(icon)
   tray.setToolTip(appTitle)
   const contextMenu = Menu.buildFromTemplate([
-    {
-      label: '显示悬浮球', click: () => {
-        floatingBall.show()
-        floatingBall.setAlwaysOnTop(true)
-      }
-    },
-    { label: '隐藏悬浮球', click: () => { floatingBall.hide() } },
+    { label: '显示/隐藏悬浮球', click: showOrHideFloatingBall },
     { label: '退出', role: 'quit' }
   ])
   tray.setContextMenu(contextMenu)
@@ -232,12 +228,7 @@ function createFloatingBall() {
     }
   })
 
-  ipcMain.on('ball-click', () => {
-    const [left, top] = floatingBall.getPosition()
-    const leftPos = left < screenWidth / 2 ? left + winWidth + 30 : left - 630
-    softwareDialog.setPosition(leftPos, top - 50)
-    softwareDialog.show()
-  })
+  ipcMain.on('ball-click', showOrHideSoftwareDialog)
 
   ipcMain.on('ball-leave', () => {
     softwareDialog.hide()
@@ -246,6 +237,15 @@ function createFloatingBall() {
   floatingBall.on('close', () => {
     floatingBall = null
   })
+}
+export function showOrHideFloatingBall() {
+  if (!floatingBall) return
+  if (floatingBall.isVisible()) {
+    floatingBall.hide()
+  } else {
+    floatingBall.show()
+    floatingBall.setAlwaysOnTop(true, 'screen-saver')
+  }
 }
 
 // 创建软件悬浮框
@@ -280,6 +280,21 @@ function createSoftwareDialog() {
     softwareDialog.hide()
   })
 }
+export function showOrHideSoftwareDialog() {
+  if (!softwareDialog) return
+  const [screenWidth, screenHeight] = [screen.getPrimaryDisplay().workAreaSize.width, screen.getPrimaryDisplay().workAreaSize.height]
+  const [left, top] = floatingBall.getPosition()
+  const leftPos = left < screenWidth / 2 ? left + 80 : left - 630
+  softwareDialog.setPosition(leftPos, top - 50)
+
+  if (softwareDialog.isVisible()) {
+    softwareDialog.hide()
+  } else {
+    softwareDialog.show()
+    softwareDialog.setAlwaysOnTop(true, 'screen-saver')
+  }
+}
+
 
 // 监听设置变化
 function settingChange(newValue, oldValue) {

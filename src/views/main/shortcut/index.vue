@@ -1,19 +1,19 @@
 <template>
   <div class="card shortcut-page">
-    <div class="flex-center shortcut-row">
-      <span>显示/隐藏主页面</span>
+    <div class="flex-center shortcut-row" v-for="(item, index) in shortcutList">
+      <span>{{ item.name }}</span>
       <el-input
-        v-model="shortcutMap.openMainWin"
+        v-model="shortcutMap[item.key]"
         style="width: 240px"
         placeholder="Press shortcut"
         readonly
-        @focus="selectInput"
+        @focus="focusInput = item.key"
         @blur="focusInput = ''"
       >
         <template #suffix>
-          <el-icon class="el-input__icon" @click="shortcutMap.openMainWin = ''"
-            ><CloseBold
-          /></el-icon>
+          <el-icon class="el-input__icon" @click="shortcutMap[item.key] = ''">
+            <CloseBold />
+          </el-icon>
         </template>
       </el-input>
     </div>
@@ -22,9 +22,18 @@
 
 <script lang="ts" setup>
 import { onUnmounted, reactive, watch, toRaw } from 'vue'
+import type { IShortcut } from '~/types/globalTypes'
 
-const shortcutMap = reactive({
-  openMainWin: ''
+const shortcutList = [
+  { name: '显示/隐藏主页面', key: 'showMainWin' },
+  { name: '显示/隐藏悬浮窗', key: 'showSoftwareDialog' },
+  { name: '显示/隐藏悬浮球', key: 'showFloatingBall' }
+]
+
+const shortcutMap: IShortcut = reactive({
+  showMainWin: '',
+  showSoftwareDialog: '',
+  showFloatingBall: ''
 })
 window.ipcRenderer.invoke('get-global-shortcut').then((res) => {
   if (res) Object.assign(shortcutMap, res)
@@ -34,9 +43,6 @@ window.ipcRenderer.invoke('get-global-shortcut').then((res) => {
 })
 
 let focusInput: string
-const selectInput = () => {
-  focusInput = 'openMainWin'
-}
 
 // 记录快捷键
 function recordShortcut(event: KeyboardEvent) {
@@ -50,7 +56,7 @@ function recordShortcut(event: KeyboardEvent) {
     if (shortcut.length < 1) return
 
     shortcut.push(event.key)
-    shortcutMap.openMainWin = shortcut.join('+')
+    shortcutMap[focusInput] = shortcut.join('+')
   }
 }
 
@@ -69,6 +75,7 @@ onUnmounted(() => {
 
 .shortcut-row {
   justify-content: space-between;
+  margin-bottom: 15px;
 
   .el-input,
   .el-input__icon,

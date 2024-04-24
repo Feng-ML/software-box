@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
 import { reactive, toRaw, watch } from "vue";
+import type { ISetting } from "~/types/globalTypes";
 
 const useSettingStore = defineStore("globalSetting", () => {
 
-    const setting = reactive({
+    const setting: ISetting = reactive({
         theme: "light",
         isAutoStartup: false,
         isOpenAtStartup: true,

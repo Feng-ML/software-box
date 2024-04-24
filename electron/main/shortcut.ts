@@ -1,11 +1,13 @@
 import { ipcMain, globalShortcut } from 'electron'
 import { saveStore, getStore } from './store'
-import type { IShoutcut } from '../types'
-import { showOrHideWin } from './index'
+import { showOrHideWin, showOrHideSoftwareDialog, showOrHideFloatingBall } from './index'
+import type { IShortcut } from '~/types/globalTypes'
 
 let shortcutStore: any = getStore('shortcut') || {}
-let shortcutFn: IShoutcut = {
-  openMainWin: showOrHideWin
+let shortcutFn: IShortcut = {
+  showMainWin: showOrHideWin,
+  showSoftwareDialog: showOrHideSoftwareDialog,
+  showFloatingBall: showOrHideFloatingBall
 }
 export function shortcutInit() {
   for (const key in shortcutStore) {
@@ -16,7 +18,7 @@ export function shortcutInit() {
   }
 }
 // 监听快捷键变化
-function shortcutChange(newValue: IShoutcut, oldValue: IShoutcut) {
+function shortcutChange(newValue: IShortcut, oldValue: IShortcut) {
   for (const key in newValue) {
     if (Object.prototype.hasOwnProperty.call(newValue, key)) {
       const newElement = newValue[key];
@@ -30,7 +32,7 @@ function shortcutChange(newValue: IShoutcut, oldValue: IShoutcut) {
 }
 
 // 监听全局快捷键
-ipcMain.on('set-global-shortcut', (event, data: IShoutcut) => {
+ipcMain.on('set-global-shortcut', (event, data: IShortcut) => {
   saveStore('shortcut', data)
   shortcutChange(data, shortcutStore)
   shortcutStore = data
