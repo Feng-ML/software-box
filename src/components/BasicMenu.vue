@@ -2,7 +2,7 @@
   <div class="basic-menu">
     <div class="card menu-box">
       <div class="top-box"></div>
-      <div class="hover-box" ref="HoverBoxRef"></div>
+      <div class="hover-box" ref="HoverBoxRef" :style="{ top: hoverBoxTop }"></div>
       <ul>
         <li
           v-for="(item, index) in list"
@@ -19,7 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 interface IMenuItem {
   name: string
   icon: string
@@ -34,9 +35,19 @@ const props = defineProps({
 const HoverBoxRef = ref()
 const activeIndex = ref(0)
 
+// 路由初始化选中
+const path = useRoute().path
+const pathIndex = props.list.findIndex((item) => item.path == path)
+if (pathIndex > -1) {
+  activeIndex.value = pathIndex
+}
+
+const hoverBoxTop = computed(() => {
+  return activeIndex.value * 67 + 20 + 'px'
+})
+
 function menuClick(index: number) {
   activeIndex.value = index
-  HoverBoxRef.value.style.top = index * 67 + 20 + 'px'
   HoverBoxRef.value.animate(
     [{ transform: 'scale(1, 1)' }, { transform: 'scale(0.5, 1.5)' }, { transform: 'scale(1, 1)' }],
     {

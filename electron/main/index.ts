@@ -60,6 +60,7 @@ let globalSetting: ISetting = getStore('setting') as ISetting || {
 
 // 主页面
 export let win: BrowserWindow | null = null
+let winCanClose = false
 function createWindow() {
   // Menu.setApplicationMenu(null) // null值取消顶部菜单栏
   win = new BrowserWindow({
@@ -104,6 +105,13 @@ function createWindow() {
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https:')) shell.openExternal(url)
     return { action: 'deny' }
+  })
+
+  win.on('close', (event) => {
+    if (!winCanClose) {
+      event.preventDefault()
+      win.hide()
+    }
   })
 
   // 右键菜单
@@ -156,7 +164,12 @@ function createTray() {
   tray.setToolTip(appTitle)
   const contextMenu = Menu.buildFromTemplate([
     { label: '显示/隐藏悬浮球', click: showOrHideFloatingBall },
-    { label: '退出', role: 'quit' }
+    {
+      label: '退出', click: () => {
+        winCanClose = true
+        app.quit()
+      }
+    }
   ])
   tray.setContextMenu(contextMenu)
   tray.on('click', showOrHideWin)

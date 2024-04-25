@@ -47,7 +47,7 @@ let focusInput: string
 // 记录快捷键
 function recordShortcut(event: KeyboardEvent) {
   if (!focusInput) return
-
+  event.preventDefault()
   if (!['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) {
     const shortcut = []
     if (event.ctrlKey) shortcut.push('Ctrl')
