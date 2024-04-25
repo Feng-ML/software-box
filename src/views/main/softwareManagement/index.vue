@@ -24,15 +24,10 @@
         <el-icon v-show="isEdit" class="delete-btn" size="20" @click.stop="deleteItem(i.id)">
           <RemoveFilled />
         </el-icon>
-        <el-tooltip class="box-item" :content="i.name" placement="top">
-          <el-image
-            draggable="false"
-            style="width: 100%; height: 100%"
-            :src="i.icon"
-            @click="openFile(i.path)"
-          />
-          <!-- <div class="box-name">名称</div> -->
+        <el-tooltip :content="i.name" placement="top">
+          <el-image draggable="false" :src="i.icon" @click="openFile(i.path)" />
         </el-tooltip>
+        <!-- <div class="box-name">{{ i.name }}</div> -->
       </div>
       <!-- <div v-for="i in 150" class="box-card"><el-image style="width: 100%; height: 100%" /></div> -->
     </div>
@@ -330,7 +325,7 @@ watchEffect(() => {
 .card-default {
   transition-duration: 0.3s;
   width: 50px;
-  height: 50px;
+  // height: 50px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -351,14 +346,14 @@ watchEffect(() => {
     }
   }
 
-  .box-item {
-    width: 110px;
-    margin-top: 40px;
-  }
-
   .box-name {
+    width: 50px;
+    overflow: hidden;
     text-align: center;
-    line-height: 30px;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
+    margin-top: 6px;
   }
 
   .delete-btn {

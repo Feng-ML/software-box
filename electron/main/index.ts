@@ -69,6 +69,7 @@ function createWindow() {
     icon: appIcon,
     show: false,
     maximizable: false,
+    fullscreenable: false,
     frame: false,
     webPreferences: {
       preload,
@@ -177,6 +178,7 @@ function createFloatingBall() {
     show: false,
     maximizable: false,
     minimizable: false,
+    fullscreenable: false,
     acceptFirstMouse: true,
     transparent: true, //设置透明
     hasShadow: false, //不显示阴影
@@ -259,6 +261,7 @@ function createSoftwareDialog() {
     resizable: false, //禁止窗口大小缩放
     maximizable: false,
     minimizable: false,
+    fullscreenable: false,
     alwaysOnTop: true, //窗口是否总是显示在其他窗口之前
     skipTaskbar: true,
     transparent: true, //设置透明
