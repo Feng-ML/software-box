@@ -1,5 +1,5 @@
 <template>
-  <div id="ballWin" @click="ballClick" @mousedown="mousedown">
+  <div id="ballWin" @click="ballClick" @mousedown="mousedown" :style="{ opacity }">
     <div class="ballBox" draggable="false" :class="aside">
       <div class="background-circle"></div>
       <div class="up-circle"></div>
@@ -9,7 +9,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import settingStore from '@/stores/setting'
+
+const setting = settingStore().setting
+const opacity = computed(() => setting.transparency / 100)
 
 // 是否可拖拽
 // const draggable = ref(true);

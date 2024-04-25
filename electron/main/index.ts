@@ -49,8 +49,7 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 const appIcon = join(process.env.VITE_PUBLIC, 'favicon.ico')
 const appTitle = 'Software-box'
-let globalSetting: ISetting = getStore('setting') as ISetting || {
-  theme: "light",
+let globalSetting = getStore('setting') as ISetting || {
   isAutoStartup: false,
   isOpenAtStartup: true,
   isShowTrayIcon: true,
@@ -313,8 +312,9 @@ export function showOrHideSoftwareDialog() {
 
 
 // 监听设置变化
-function settingChange(newValue, oldValue) {
-  if (newValue.theme !== oldValue.theme) softwareDialog.webContents.send('refresh-page')
+function settingChange(newValue: ISetting, oldValue: ISetting) {
+  floatingBall.webContents.send('update-global-setting', newValue)
+  softwareDialog.webContents.send('update-global-setting', newValue)
 
   if (newValue.isAutoStartup !== oldValue.isAutoStartup) {
     app.setLoginItemSettings({
@@ -344,7 +344,7 @@ function settingChange(newValue, oldValue) {
 // 监听全局设置
 ipcMain.on('set-global-setting', (event, data) => {
   saveStore('setting', data)
-  settingChange(data, globalSetting)
+  settingChange(data, globalSetting as ISetting)
   globalSetting = data
 })
 ipcMain.handle('get-global-setting', () => {

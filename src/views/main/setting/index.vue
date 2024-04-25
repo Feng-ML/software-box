@@ -34,6 +34,10 @@
       <span>置顶</span>
       <el-switch v-model="setting.isBallAlwaysOnTop" />
     </div>
+    <div class="setting-row">
+      <span>透明度</span>
+      <el-slider v-model="setting.transparency" :min="20" :step="10" />
+    </div>
   </div>
 </template>
 
@@ -89,6 +93,10 @@ const options = [
 
   .el-segmented {
     --el-border-radius-base: 16px;
+  }
+
+  .el-slider {
+    width: 200px;
   }
 }
 </style>

@@ -11,6 +11,7 @@ const useSettingStore = defineStore("globalSetting", () => {
         isShowTrayIcon: true,
         isBallShow: true,
         isBallAlwaysOnTop: true,
+        transparency: 100
     })
 
     window.ipcRenderer.invoke("get-global-setting").then((res) => {
@@ -18,6 +19,10 @@ const useSettingStore = defineStore("globalSetting", () => {
             Object.assign(setting, res)
             console.log(res);
         }
+    })
+
+    window.ipcRenderer.on("update-global-setting", (event, newValue) => {
+        Object.assign(setting, newValue)
     })
 
     watch(setting, (newValue) => {

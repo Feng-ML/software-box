@@ -1,10 +1,11 @@
 export declare type ISetting = {
-  theme: string,
+  theme: 'light' | 'dark',
   isAutoStartup: boolean,
   isOpenAtStartup: boolean,
   isShowTrayIcon: boolean,
   isBallShow: boolean,
   isBallAlwaysOnTop: boolean,
+  transparency: number
 }
 
 export declare type IShortcut = {

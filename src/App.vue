@@ -9,8 +9,7 @@ import { RouterView } from 'vue-router'
 import settingStore from '@/stores/setting'
 import { watchEffect } from 'vue'
 
-const store = settingStore()
-const setting = store.setting
+const setting = settingStore().setting
 
 watchEffect(() => {
   document.documentElement.setAttribute('data-theme', setting.theme)
