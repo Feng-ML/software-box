@@ -11,7 +11,8 @@ const useSettingStore = defineStore("globalSetting", () => {
         isShowTrayIcon: true,
         isBallShow: true,
         isBallAlwaysOnTop: true,
-        transparency: 100
+        ballTransparency: 100,
+        ballContent: 'icon'
     })
 
     window.ipcRenderer.invoke("get-global-setting").then((res) => {

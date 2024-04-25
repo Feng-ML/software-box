@@ -34,7 +34,7 @@ const router = createRouter({
         {
           path: 'floatingBall',
           name: '悬浮球',
-          component: () => import('@/views/desktop/floatingBall.vue')
+          component: () => import('@/views/desktop/floatingBall/index.vue')
         },
         {
           path: 'software-dialog',

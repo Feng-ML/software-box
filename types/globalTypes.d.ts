@@ -5,7 +5,8 @@ export declare type ISetting = {
   isShowTrayIcon: boolean,
   isBallShow: boolean,
   isBallAlwaysOnTop: boolean,
-  transparency: number
+  ballTransparency: number,
+  ballContent: 'icon' | 'time' | 'clock'
 }
 
 export declare type IShortcut = {

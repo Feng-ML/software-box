@@ -36,7 +36,18 @@
     </div>
     <div class="setting-row">
       <span>透明度</span>
-      <el-slider v-model="setting.transparency" :min="20" :step="10" />
+      <el-slider v-model="setting.ballTransparency" :min="20" :step="10" />
+    </div>
+    <div class="setting-row">
+      <span>显示内容</span>
+      <el-select v-model="setting.ballContent" placeholder="Select">
+        <el-option
+          v-for="item in ballContentOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
     </div>
   </div>
 </template>
@@ -59,6 +70,21 @@ const options = [
     icon: 'Moon'
   }
 ]
+
+const ballContentOptions = [
+  {
+    label: '图标',
+    value: 'icon'
+  },
+  {
+    label: '电子表',
+    value: 'time'
+  },
+  {
+    label: '时钟',
+    value: 'clock'
+  }
+]
 </script>
 
 <style lang="scss">
@@ -66,6 +92,7 @@ const options = [
   padding: 20px;
   margin: 12px 12px 12px 0;
   flex: 1;
+  overflow: auto;
 
   .setting-title {
     font-size: var(--el-font-size-large);
@@ -95,7 +122,8 @@ const options = [
     --el-border-radius-base: 16px;
   }
 
-  .el-slider {
+  .el-slider,
+  .el-select {
     width: 200px;
   }
 }

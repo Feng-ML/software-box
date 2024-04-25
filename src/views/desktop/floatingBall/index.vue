@@ -1,28 +1,43 @@
 <template>
   <div id="ballWin" @click="ballClick" @mousedown="mousedown" :style="{ opacity }">
-    <div class="ballBox" draggable="false" :class="aside">
+    <div class="ballBox" draggable="false" :class="setting.ballContent">
       <div class="background-circle"></div>
       <div class="up-circle"></div>
-      <img draggable="false" src="@/../public/favicon.ico" alt="" />
+      <p v-if="setting.ballContent === 'time'" class="time-number">{{ time }}</p>
+      <Clock v-else-if="setting.ballContent === 'clock'" />
+      <img v-else draggable="false" src="@/../public/favicon.ico" alt="" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import settingStore from '@/stores/setting'
+import Clock from './clock.vue'
 
 const setting = settingStore().setting
-const opacity = computed(() => setting.transparency / 100)
+const opacity = computed(() => setting.ballTransparency / 100)
 
 // 是否可拖拽
 // const draggable = ref(true);
 
-const aside = ref<string>('')
+// const aside = ref<string>('')
 // window.ipcRenderer.on('adsorb-aside', (e, value) => {
 //     aside.value = value;
 // })
 
+const time = ref('')
+var timerID = setInterval(updateTime, 1000)
+updateTime()
+function updateTime() {
+  var cd = new Date()
+  time.value = zeroPadding(cd.getHours()) + ':' + zeroPadding(cd.getMinutes())
+}
+function zeroPadding(num: number) {
+  return num < 10 ? '0' + num : num
+}
+
+// 悬浮球移动
 let isMouseDown = false
 let ismoving = false
 const mousedown = (e: any) => {
@@ -47,7 +62,7 @@ const mousedown = (e: any) => {
     window.ipcRenderer.send('ball-moved')
   }
 }
-
+// 悬浮球点击
 const ballClick = () => {
   if (!ismoving) {
     window.ipcRenderer.send('ball-click')
@@ -64,6 +79,10 @@ const ballClick = () => {
 //         window.ipcRenderer.send('ball-leave')
 //     }
 // }
+
+onUnmounted(() => {
+  clearInterval(timerID)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -74,6 +93,7 @@ const ballClick = () => {
 }
 
 .ballBox {
+  position: relative;
   margin: auto;
   width: 100%;
   height: 100%;
@@ -84,9 +104,10 @@ const ballClick = () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  justify-content: center;
 
   .background-circle {
-    // position: absolute;
+    position: absolute;
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -106,6 +127,14 @@ const ballClick = () => {
     -webkit-backdrop-filter: blur(10px);
     opacity: 0.7;
   }
+  &.time .up-circle {
+    background: radial-gradient(ellipse at center, #0a2e38 0%, #000000 70%);
+    opacity: 1;
+  }
+  &.clock .up-circle {
+    background: none;
+    opacity: 1;
+  }
 
   img {
     width: 65%;
@@ -116,6 +145,19 @@ const ballClick = () => {
     left: 0;
     bottom: 0;
     right: 0;
+  }
+
+  .time-number {
+    position: absolute;
+    font-size: 12px;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    font-family: 'Share Tech Mono', monospace;
+    color: #daf6ff;
+    text-shadow:
+      0 0 20px rgba(10, 175, 230, 1),
+      0 0 20px rgba(10, 175, 230, 0);
   }
 }
 
