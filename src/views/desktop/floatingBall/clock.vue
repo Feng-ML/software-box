@@ -77,8 +77,8 @@ onMounted(() => {
   height: 230px;
   .clock-indicator {
     position: absolute;
-    width: 2px;
-    height: 4px;
+    width: 4px;
+    height: 6px;
     margin: 113px 114px;
     background-color: #ddd;
   }
@@ -88,7 +88,6 @@ onMounted(() => {
 @for $i from 1 through 12 {
   .clock-indicator:nth-child(#{$i}) {
     transform: rotate(#{30 * $i}deg) translateY(-113px);
-    background-color: #aaa;
     @if $i%3==0 {
       background-color: #c00;
     }

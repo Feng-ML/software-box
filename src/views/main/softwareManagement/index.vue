@@ -27,7 +27,7 @@
         <el-tooltip :content="i.name" placement="top">
           <el-image draggable="false" :src="i.icon" @click="openFile(i.path)" />
         </el-tooltip>
-        <!-- <div class="box-name">{{ i.name }}</div> -->
+        <div v-if="setting.isShowSoftwareName" class="box-name">{{ i.name }}</div>
       </div>
       <!-- <div v-for="i in 150" class="box-card"><el-image style="width: 100%; height: 100%" /></div> -->
     </div>
@@ -64,7 +64,9 @@ import { throttle, generateRandomId } from '@/utils/common'
 import BasicDialog from '@/components/BasicDialog.vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
+import settingStore from '@/stores/setting'
 
+const setting = settingStore().setting
 // 是否为桌面组件
 const props = defineProps({
   isDesktop: Boolean
@@ -126,8 +128,12 @@ const editCategory = (index: number, name: string) => {
 const deleteCategory = (index: number) => {
   categoryList.value.splice(index, 1)
   saveData()
+
   if (index === activeIndex.value) {
     activeIndex.value = 0
+  }
+  if (activeIndex.value > index) {
+    activeIndex.value--
   }
 }
 
@@ -135,6 +141,7 @@ const addItem = (file: any) => {
   const list = softwareList.value
   Array.isArray(file) ? list.push(...file) : list.push(file)
   saveData()
+  console.log('softwareList===>', list)
 }
 
 const selectFile = async (type: string) => {

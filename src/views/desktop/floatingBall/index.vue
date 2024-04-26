@@ -152,6 +152,7 @@ onUnmounted(() => {
     font-size: 12px;
     text-align: center;
     width: 100%;
+    user-select: none;
     font-weight: bold;
     font-family: 'Share Tech Mono', monospace;
     color: #daf6ff;

@@ -9,6 +9,9 @@ const useSettingStore = defineStore("globalSetting", () => {
         isAutoStartup: false,
         isOpenAtStartup: true,
         isShowTrayIcon: true,
+
+        isShowSoftwareName: false,
+
         isBallShow: true,
         isBallAlwaysOnTop: true,
         ballTransparency: 100,

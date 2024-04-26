@@ -3,6 +3,9 @@ export declare type ISetting = {
   isAutoStartup: boolean,
   isOpenAtStartup: boolean,
   isShowTrayIcon: boolean,
+
+  isShowSoftwareName: boolean,
+
   isBallShow: boolean,
   isBallAlwaysOnTop: boolean,
   ballTransparency: number,

@@ -25,6 +25,13 @@
       <span>显示托盘图标</span>
       <el-switch v-model="setting.isShowTrayIcon" />
     </div>
+
+    <div class="setting-title">软件管理</div>
+    <div class="setting-row">
+      <span>显示软件名称</span>
+      <el-switch v-model="setting.isShowSoftwareName" />
+    </div>
+
     <div class="setting-title">悬浮球</div>
     <div class="setting-row">
       <span>开启悬浮球</span>
@@ -55,8 +62,7 @@
 <script lang="ts" setup>
 import settingStore from '@/stores/setting'
 
-const store = settingStore()
-const setting = store.setting
+const setting = settingStore().setting
 
 const options = [
   {
@@ -107,7 +113,7 @@ const ballContentOptions = [
 
   .setting-row {
     margin-left: 20px;
-    margin-bottom: 15px;
+    margin-top: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;

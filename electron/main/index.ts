@@ -65,7 +65,7 @@ function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
     width: 800,
-    height: 600,
+    height: 610,
     icon: appIcon,
     show: false,
     maximizable: false,
