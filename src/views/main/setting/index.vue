@@ -56,6 +56,12 @@
         />
       </el-select>
     </div>
+
+    <div class="setting-title">软件悬浮窗</div>
+    <div class="setting-row">
+      <span>背景透明度</span>
+      <el-slider v-model="setting.dialogTransparency" :step="10" />
+    </div>
   </div>
 </template>
 

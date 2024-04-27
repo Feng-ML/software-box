@@ -79,8 +79,8 @@ onUnmounted(() => {
 
   .el-input,
   .el-input__icon,
-  :deep .el-input__wrapper,
-  :deep input {
+  :deep(.el-input__wrapper),
+  :deep(input) {
     cursor: pointer !important;
   }
 }

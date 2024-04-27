@@ -9,7 +9,9 @@ export declare type ISetting = {
   isBallShow: boolean,
   isBallAlwaysOnTop: boolean,
   ballTransparency: number,
-  ballContent: 'icon' | 'time' | 'clock'
+  ballContent: 'icon' | 'time' | 'clock',
+
+  dialogTransparency: number
 }
 
 export declare type IShortcut = {
