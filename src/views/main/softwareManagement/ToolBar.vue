@@ -46,7 +46,7 @@
           @keyup.enter="handleInputConfirm"
           @blur="handleInputConfirm"
         />
-        <el-button v-else text size="small" icon="plus" circle @click="showInput" />
+        <el-button v-else text size="small" :icon="Plus" circle @click="showInput" />
       </div>
     </div>
 
@@ -63,7 +63,7 @@
           <CirclePlusFilled />
         </el-icon>
         <el-icon class="success-color" size="20" title="完成" @click="isEdit = !isEdit">
-          <Select />
+          <SelectIcon />
         </el-icon>
       </div>
     </div>
@@ -77,7 +77,7 @@ import { ElInput } from 'element-plus'
 
 import BasicSearch from '@/components/BasicSearch.vue'
 import Draggable from 'vuedraggable'
-import { Tools, CirclePlusFilled, Select } from '@element-plus/icons-vue'
+import { Tools, CirclePlusFilled, Select as SelectIcon, Plus } from '@element-plus/icons-vue'
 
 const isDesktop = inject('isDesktop')
 const emit = defineEmits(['add', 'search', 'addTag', 'deleteTag', 'editTag', 'sortTag'])
