@@ -1,30 +1,41 @@
 <template>
   <div class="tool-bar">
-    <div>{{ title }}</div>
-    <div class="tag-list">
-      <div v-for="(item, index) in list" class="tag-item" :key="item.id">
-        <el-input
-          v-if="editIndex === index"
-          :id="'tagInput' + index"
-          v-model="editInputValue"
-          size="small"
-          @keyup.enter="handleEditConfirm"
-          @blur="handleEditConfirm"
-        />
+    <div class="tool-bar-left">
+      <div>{{ title }}</div>
 
-        <el-tag
-          v-else
-          :type="activeIndex === index ? 'primary' : 'info'"
-          :closable="isEdit"
-          effect="light"
-          size="large"
-          @click="activeIndex = index"
-          @close="emit('deleteTag', index)"
-          @contextmenu="handleContextmenu(index)"
-        >
-          {{ item.name }}
-        </el-tag>
-      </div>
+      <Draggable
+        v-model="tagList"
+        item-key="id"
+        class="tag-list"
+        :disabled="sortDisable"
+        @end="handleSort"
+      >
+        <template #item="{ element, index }">
+          <div class="tag-item">
+            <el-input
+              v-if="editIndex === index"
+              :id="'tagInput' + index"
+              v-model="editInputValue"
+              size="small"
+              @keyup.enter="handleEditConfirm"
+              @blur="handleEditConfirm"
+            />
+
+            <el-tag
+              v-else
+              :type="activeIndex === index ? 'primary' : 'info'"
+              :closable="isEdit"
+              effect="light"
+              size="large"
+              @click="activeIndex = index"
+              @close="emit('deleteTag', index)"
+              @contextmenu="handleContextmenu(index)"
+            >
+              {{ element.name }}
+            </el-tag>
+          </div>
+        </template>
+      </Draggable>
 
       <div v-if="!isDesktop">
         <el-input
@@ -62,11 +73,12 @@
 <script lang="ts" setup>
 import BasicSearch from '@/components/BasicSearch.vue'
 import type { ICategoryItem } from '@/interfaces'
-import { inject, nextTick, ref } from 'vue'
+import { inject, nextTick, ref, onMounted, toRaw, watchEffect, computed, watch } from 'vue'
 import { ElInput } from 'element-plus'
+import Draggable from 'vuedraggable'
 
 const isDesktop = inject('isDesktop')
-const emit = defineEmits(['add', 'search', 'addTag', 'deleteTag', 'editTag'])
+const emit = defineEmits(['add', 'search', 'addTag', 'deleteTag', 'editTag', 'sortTag'])
 const isEdit = defineModel<boolean>('isEdit')
 const activeIndex = defineModel<number>('activeIndex')
 
@@ -81,18 +93,21 @@ const props = defineProps({
     default: () => []
   }
 })
+let tagList: ICategoryItem[]
+watchEffect(() => {
+  tagList = toRaw(props.list)
+})
 
+// 新增
 const inputValue = ref('')
 const inputVisible = ref(false)
 const InputRef = ref<InstanceType<typeof ElInput>>()
-
 const showInput = () => {
   inputVisible.value = true
   nextTick(() => {
     InputRef.value!.input!.focus()
   })
 }
-
 const handleInputConfirm = () => {
   if (inputValue.value) {
     emit('addTag', inputValue.value)
@@ -112,6 +127,10 @@ const handleEditConfirm = () => {
   editInputValue.value = ''
 }
 
+// 排序
+const sortDisable = computed(() => inputVisible.value || editInputValue.value)
+const handleSort = () => emit('sortTag', tagList)
+
 // 右键菜单
 let selectIndex: number
 const handleContextmenu = (index: number) => {
@@ -129,7 +148,7 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
   switch (command) {
     case 'tag-rename':
       editIndex.value = selectIndex
-      editInputValue.value = props.list[selectIndex]?.name
+      editInputValue.value = props.list[selectIndex].name
       nextTick(() => {
         const el = document.getElementById('tagInput' + selectIndex)
         el?.focus()
@@ -153,15 +172,20 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
   height: 50px;
   flex-shrink: 0;
 
-  .tag-list {
+  .tool-bar-left {
     display: flex;
+    align-items: center;
     flex: 1;
     overflow: auto;
     margin-right: 12px;
-    align-items: center;
     &::-webkit-scrollbar {
       display: none;
     }
+  }
+
+  .tag-list {
+    display: flex;
+    align-items: center;
     .tag-item {
       margin-right: 10px;
       cursor: pointer;

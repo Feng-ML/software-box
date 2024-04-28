@@ -11,6 +11,7 @@
       @addTag="addCategory"
       @editTag="editCategory"
       @deleteTag="deleteCategory"
+      @sortTag="sortCategory"
     />
 
     <div class="empty" v-if="!softList || !softList.length">
@@ -19,18 +20,31 @@
       <div v-else>请先新增分组</div>
     </div>
 
-    <div class="box-content" ref="boxContentRef">
-      <div v-for="i in softList" :key="i.id" class="box-card" @contextmenu="handleContextMenu(i)">
-        <el-icon v-show="isEdit" class="delete-btn" size="20" @click.stop="deleteItem(i.id)">
-          <RemoveFilled />
-        </el-icon>
-        <el-tooltip :content="i.name" placement="top">
-          <el-image draggable="false" :src="i.icon" @click="openFile(i.path)" />
-        </el-tooltip>
-        <div v-if="setting.isShowSoftwareName" class="box-name">{{ i.name }}</div>
-      </div>
-      <!-- <div v-for="i in 150" class="box-card"><el-image style="width: 100%; height: 100%" /></div> -->
-    </div>
+    <Draggable
+      v-model="softList"
+      item-key="id"
+      class="box-content"
+      :disabled="sortDisable"
+      @end="sortSoftList"
+    >
+      <template #item="{ element, index }">
+        <div class="box-card" @contextmenu="handleContextMenu(element)">
+          <el-icon
+            v-show="isEdit"
+            class="delete-btn"
+            size="20"
+            @click.stop="deleteItem(element.id)"
+          >
+            <RemoveFilled />
+          </el-icon>
+          <el-tooltip :content="element.name" placement="top">
+            <el-image draggable="false" :src="element.icon" @click="openFile(element.path)" />
+          </el-tooltip>
+          <div v-if="setting.isShowSoftwareName" class="box-name">{{ element.name }}</div>
+        </div>
+      </template>
+    </Draggable>
+    <!-- <div v-for="i in 150" class="box-card"><el-image style="width: 100%; height: 100%" /></div> -->
 
     <BasicDialog title="图标设置" v-model="dialogVisible" width="500" @submit="formSubmit(formRef)">
       <template #content>
@@ -56,15 +70,15 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, computed, watchEffect, reactive, toRaw, provide } from 'vue'
+import { ref, computed, watchEffect, reactive, toRaw, provide, shallowRef } from 'vue'
 import type { ICategoryItem, ISoftware } from '@/interfaces'
-import Sortable from 'sortablejs'
 import ToolBar from './ToolBar.vue'
 import { throttle, generateRandomId } from '@/utils/common'
 import BasicDialog from '@/components/BasicDialog.vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 import settingStore from '@/stores/setting'
+import Draggable from 'vuedraggable'
 
 const setting = settingStore().setting
 // 是否为桌面组件
@@ -74,24 +88,11 @@ const props = defineProps({
 provide('isDesktop', props.isDesktop)
 
 const emit = defineEmits(['update:list'])
-const boxContentRef = ref()
 const isEdit = ref(false)
 
 const categoryList = ref<ICategoryItem[]>([])
 const softwareList = computed(() => categoryList.value[activeIndex.value]?.softwareList)
 const activeIndex = ref(0)
-
-// 搜索
-const searchValue = ref('')
-const searchSoft = (value: string) => {
-  searchValue.value = value
-}
-const softList = computed(() => {
-  if (!searchValue.value) return softwareList.value
-  return softwareList.value.filter((item) =>
-    item.name.toLowerCase().includes(searchValue.value.toLowerCase())
-  )
-})
 
 // 获取数据
 window.ipcRenderer.invoke('get-category-list').then((data: ICategoryItem[]) => {
@@ -137,6 +138,42 @@ const deleteCategory = (index: number) => {
   }
 }
 
+// 排序分组
+const sortCategory = (list: ICategoryItem[]) => {
+  const selectId = categoryList.value[activeIndex.value].id
+  const newSelectIndex = list.findIndex((item) => item.id === selectId)
+
+  categoryList.value = list
+  activeIndex.value = newSelectIndex
+  saveData()
+}
+
+// 图标搜索
+const searchValue = ref('')
+const searchSoft = (value: string) => {
+  searchValue.value = value
+}
+
+// 图标列表
+const softList = shallowRef<ISoftware[]>([])
+watchEffect(() => {
+  if (searchValue.value) {
+    softList.value = softwareList.value.filter((item) =>
+      item.name.toLowerCase().includes(searchValue.value.toLowerCase())
+    )
+  } else {
+    softList.value = toRaw(softwareList.value)
+  }
+})
+
+// 图标排序
+const sortDisable = computed(() => !isEdit.value || searchValue.value)
+const sortSoftList = () => {
+  categoryList.value[activeIndex.value].softwareList = toRaw(softList.value)
+  saveData()
+}
+
+// 添加图标
 const addItem = (file: any) => {
   const list = softwareList.value
   Array.isArray(file) ? list.push(...file) : list.push(file)
@@ -271,40 +308,6 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
       break
     default:
       break
-  }
-})
-
-// 排序拖拽组件
-let boxSortable: any
-onMounted(() => {
-  boxSortable = Sortable.create(boxContentRef.value, {
-    // group: 'menu',
-    animation: 250,
-    ghostClass: 'sortable-ghost', //放置占位符的类名
-    dragClass: 'sortable-drag', //所选项目的类名
-    // filter: '.not-sort', // 禁用拖拽的类名
-    disabled: true,
-
-    onEnd: (evt: any) => {
-      const { oldIndex, newIndex } = evt
-      const list = softwareList.value
-
-      // 交换位置
-      if (newIndex !== oldIndex) {
-        const old = list.splice(oldIndex, 1)[0]
-        list.splice(newIndex, 0, old)
-        saveData()
-      }
-    }
-  })
-})
-
-// 是否允许拖拽
-watchEffect(() => {
-  if (isEdit.value && !searchValue.value) {
-    boxSortable?.option('disabled', false)
-  } else {
-    boxSortable?.option('disabled', true)
   }
 })
 </script>
