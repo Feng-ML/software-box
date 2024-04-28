@@ -71,14 +71,17 @@
 
 <script lang="ts" setup>
 import { ref, computed, watchEffect, reactive, toRaw, provide, shallowRef } from 'vue'
-import type { ICategoryItem, ISoftware } from '@/interfaces'
-import ToolBar from './ToolBar.vue'
 import { throttle, generateRandomId } from '@/utils/common'
-import BasicDialog from '@/components/BasicDialog.vue'
 import { ElMessage } from 'element-plus'
-import type { FormInstance } from 'element-plus'
 import settingStore from '@/stores/setting'
+
+import type { ICategoryItem, ISoftware } from '@/interfaces'
+import type { FormInstance } from 'element-plus'
+
+import BasicDialog from '@/components/BasicDialog.vue'
+import ToolBar from './ToolBar.vue'
 import Draggable from 'vuedraggable'
+import { RemoveFilled } from '@element-plus/icons-vue'
 
 const setting = settingStore().setting
 // 是否为桌面组件

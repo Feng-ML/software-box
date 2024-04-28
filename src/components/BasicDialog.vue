@@ -10,16 +10,9 @@
                 v-model="form[item.prop]"
                 v-bind="item.attrs || {}"
               />
-
-              <div v-if="item.type === 'icon'" class="icon-is-select">
-                <el-icon @click="iconSelectDialogOpen">
-                  <component :is="form[item.prop]" />
-                </el-icon>
-              </div>
             </el-form-item>
           </div>
         </el-form>
-        <IconSelect ref="iconSelectRef" @select="iconSelect" />
       </div>
     </slot>
     <template #footer>
@@ -32,9 +25,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, toRaw, watch, watchEffect } from 'vue'
+import { reactive, ref, toRaw, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
-import IconSelect from './IconSelect.vue'
 
 const emit = defineEmits(['submit'])
 const model = defineModel()
@@ -63,7 +55,6 @@ interface IFormItem {
 let form: IFormItem = reactive({})
 let formRules: IFormItem = reactive({})
 const formRef = ref<FormInstance>()
-const iconSelectRef = ref()
 
 watch(model, (newVal) => {
   if (newVal) {
@@ -72,12 +63,7 @@ watch(model, (newVal) => {
     if (props.formConfig) {
       props.formConfig.forEach((item) => {
         if (item.rules) formRules[item.prop] = item.rules
-        if (item.type === 'icon') iconAttrName = item.prop
       })
-      // 默认添加图标
-      if (props.formType === 'add' && iconAttrName) {
-        form[iconAttrName] = 'Shop'
-      }
     }
     if (props.formType === 'edit') {
       Object.assign(form, props.formData)
@@ -87,19 +73,9 @@ watch(model, (newVal) => {
     setTimeout(() => {
       form = reactive({})
       formRules = reactive({})
-      iconAttrName = ''
     }, 10)
   }
 })
-
-// 图标选择
-let iconAttrName = ''
-const iconSelectDialogOpen = () => {
-  iconSelectRef.value?.show()
-}
-const iconSelect = (name: string) => {
-  form[iconAttrName] = name
-}
 
 const closeDialog = () => {
   model.value = false

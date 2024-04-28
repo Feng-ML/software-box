@@ -71,11 +71,13 @@
 </template>
 
 <script lang="ts" setup>
-import BasicSearch from '@/components/BasicSearch.vue'
-import type { ICategoryItem } from '@/interfaces'
 import { inject, nextTick, ref, onMounted, toRaw, watchEffect, computed, watch } from 'vue'
+import type { ICategoryItem } from '@/interfaces'
 import { ElInput } from 'element-plus'
+
+import BasicSearch from '@/components/BasicSearch.vue'
 import Draggable from 'vuedraggable'
+import { Tools, CirclePlusFilled, Select } from '@element-plus/icons-vue'
 
 const isDesktop = inject('isDesktop')
 const emit = defineEmits(['add', 'search', 'addTag', 'deleteTag', 'editTag', 'sortTag'])

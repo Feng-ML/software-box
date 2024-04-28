@@ -67,6 +67,7 @@
 
 <script lang="ts" setup>
 import settingStore from '@/stores/setting'
+import { Sunny, Moon } from '@element-plus/icons-vue'
 
 const setting = settingStore().setting
 
@@ -74,12 +75,12 @@ const options = [
   {
     label: 'light',
     value: 'light',
-    icon: 'Sunny'
+    icon: Sunny
   },
   {
     label: 'dark',
     value: 'dark',
-    icon: 'Moon'
+    icon: Moon
   }
 ]
 

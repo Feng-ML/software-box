@@ -17,6 +17,8 @@
 </template>
 
 <script lang="ts" setup>
+import { SemiSelect, CloseBold } from '@element-plus/icons-vue'
+
 const winToolClick = (type: string) => {
   window.ipcRenderer.send('win-tool-click', type)
 }

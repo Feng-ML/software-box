@@ -23,6 +23,7 @@
 <script lang="ts" setup>
 import { onUnmounted, reactive, watch, toRaw } from 'vue'
 import type { IShortcut } from '~/types/globalTypes'
+import { CloseBold } from '@element-plus/icons-vue'
 
 const shortcutList = [
   { name: '显示/隐藏主页面', key: 'showMainWin' },
