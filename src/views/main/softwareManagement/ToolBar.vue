@@ -7,6 +7,7 @@
         v-model="tagList"
         item-key="id"
         class="tag-list"
+        :animation="200"
         :disabled="sortDisable"
         @end="handleSort"
       >
@@ -71,7 +72,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, nextTick, ref, onMounted, toRaw, watchEffect, computed, watch } from 'vue'
+import { inject, nextTick, ref, toRaw, computed, watch, shallowRef } from 'vue'
 import type { ICategoryItem } from '@/interfaces'
 import { ElInput } from 'element-plus'
 
@@ -95,10 +96,11 @@ const props = defineProps({
     default: () => []
   }
 })
-let tagList: ICategoryItem[]
-watchEffect(() => {
-  tagList = toRaw(props.list)
-})
+const tagList = shallowRef<ICategoryItem[]>([])
+watch(
+  () => props.list,
+  (val) => (tagList.value = toRaw(val))
+)
 
 // 新增
 const inputValue = ref('')
@@ -131,7 +133,7 @@ const handleEditConfirm = () => {
 
 // 排序
 const sortDisable = computed(() => inputVisible.value || editInputValue.value)
-const handleSort = () => emit('sortTag', tagList)
+const handleSort = () => emit('sortTag', toRaw(tagList.value))
 
 // 右键菜单
 let selectIndex: number

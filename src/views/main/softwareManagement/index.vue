@@ -25,10 +25,14 @@
       item-key="id"
       class="box-content"
       :disabled="sortDisable"
+      :animation="200"
+      ghostClass="sortable-ghost"
+      dragClass="sortable-drag"
+      @start="startSortSoftList"
       @end="sortSoftList"
     >
       <template #item="{ element, index }">
-        <div class="box-card" @contextmenu="handleContextMenu(element)">
+        <div class="box-card" :class="{ isSorting }" @contextmenu="handleContextMenu(element)">
           <el-icon
             v-show="isEdit"
             class="delete-btn"
@@ -37,7 +41,7 @@
           >
             <RemoveFilled />
           </el-icon>
-          <el-tooltip :content="element.name" placement="top">
+          <el-tooltip :content="element.name" placement="top" :disabled="isSorting">
             <el-image draggable="false" :src="element.icon" @click="openFile(element.path)" />
           </el-tooltip>
           <div v-if="setting.isShowSoftwareName" class="box-name">{{ element.name }}</div>
@@ -70,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watchEffect, reactive, toRaw, provide, shallowRef } from 'vue'
+import { ref, computed, watchEffect, reactive, toRaw, provide, shallowRef, watch } from 'vue'
 import { throttle, generateRandomId } from '@/utils/common'
 import { ElMessage } from 'element-plus'
 import settingStore from '@/stores/setting'
@@ -155,33 +159,42 @@ const sortCategory = (list: ICategoryItem[]) => {
 const searchValue = ref('')
 const searchSoft = (value: string) => {
   searchValue.value = value
+  searchSoftList()
 }
-
-// 图标列表
-const softList = shallowRef<ISoftware[]>([])
-watchEffect(() => {
+const searchSoftList = () => {
   if (searchValue.value) {
-    softList.value = softwareList.value.filter((item) =>
+    softList.value = toRaw(softwareList.value).filter((item) =>
       item.name.toLowerCase().includes(searchValue.value.toLowerCase())
     )
   } else {
     softList.value = toRaw(softwareList.value)
   }
-})
+}
+
+// 图标列表
+const softList = ref<ISoftware[]>([])
+watch(softwareList, () => (softList.value = toRaw(softwareList.value)))
 
 // 图标排序
 const sortDisable = computed(() => !isEdit.value || searchValue.value)
+const isSorting = ref(false)
+const startSortSoftList = () => {
+  isSorting.value = true
+}
 const sortSoftList = () => {
-  categoryList.value[activeIndex.value].softwareList = toRaw(softList.value)
+  categoryList.value[activeIndex.value].softwareList = toRaw(softList.value).map((item) =>
+    toRaw(item)
+  )
   saveData()
+  isSorting.value = false
 }
 
 // 添加图标
-const addItem = (file: any) => {
+const addItem = (file: any[]) => {
   const list = softwareList.value
-  Array.isArray(file) ? list.push(...file) : list.push(file)
+  list.push(...file)
   saveData()
-  console.log('softwareList===>', list)
+  searchSoftList()
 }
 
 const selectFile = async (type: string) => {
@@ -268,6 +281,7 @@ const formSubmit = async (formEl: FormInstance | undefined) => {
       const index = list.findIndex((item) => item.id === formData.id)
       list.splice(index, 1, toRaw(formData))
       saveData()
+      searchSoftList()
       dialogVisible.value = false
     }
   })
@@ -279,6 +293,7 @@ const deleteItem = (id: string) => {
   const index = list.findIndex((item) => item.id === id)
   list.splice(index, 1)
   saveData()
+  searchSoftList()
 }
 
 // 点击打开软件
@@ -336,7 +351,6 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
 
 // item基础样式
 .card-default {
-  transition-duration: 0.3s;
   width: 50px;
   // height: 50px;
   text-align: center;
@@ -357,6 +371,10 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
     &:hover {
       transform: scale(1.4);
     }
+  }
+
+  &.isSorting .el-image:hover {
+    transform: scale(1);
   }
 
   .box-name {
