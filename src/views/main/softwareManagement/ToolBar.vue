@@ -96,7 +96,7 @@ const props = defineProps({
     default: () => []
   }
 })
-const tagList = shallowRef<ICategoryItem[]>([])
+const tagList = ref<ICategoryItem[]>([])
 watch(
   () => props.list,
   (val) => (tagList.value = toRaw(val))
@@ -133,7 +133,12 @@ const handleEditConfirm = () => {
 
 // 排序
 const sortDisable = computed(() => inputVisible.value || editInputValue.value)
-const handleSort = () => emit('sortTag', toRaw(tagList.value))
+const handleSort = () => {
+  emit(
+    'sortTag',
+    toRaw(tagList.value).map((item) => toRaw(item))
+  )
+}
 
 // 右键菜单
 let selectIndex: number
