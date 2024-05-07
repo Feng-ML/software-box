@@ -1,8 +1,17 @@
-# software-box
+<p align="center">
+  <img alt="logo" width="100" src="./public/favicon.ico" />
+</p>
+<h1 align="center">software-box</h1>
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/Feng-ML/software-box)
+<p align="center">
+  A Really simple <b>Electron</b> + <b>Vue3</b> + <b>TypeScript</b> + <b>Vite</b> Software assistant.
+</p>
 
-🥳 Really simple `Electron` + `Vue3` + `TypeScript` + `Vite` Software assistant.
+<p align="center">
+  <a href="https://github.com/Feng-ML/software-box/releases/latest">
+    <img src="https://img.shields.io/github/v/release/Feng-ML/software-box" />
+  </a>
+</p>
 
 ## Introduction
 
@@ -10,7 +19,20 @@ software-box是一款简单易用的桌面端软件管理工具，支持鼠标�
 
 ![main img](show.png)
 
+## Features
+
+- 🔗支持添加所有文件格式
+- 🕹️允许鼠标拖曳批量添加
+- 🎈自定义悬浮球
+- 🎨主题切换
+- 🤖丰富的自定义配置
+- 🔑全局快捷键绑定
+
 ## Quick Setup
+
+Requirements:
+
+- `node` >= 18.19
 
 ```sh
 # clone the project
