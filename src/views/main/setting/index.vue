@@ -35,6 +35,16 @@
       <span>显示软件名称提示</span>
       <el-switch v-model="setting.isShowSoftwareNameTooltip" />
     </div>
+    <div class="setting-row">
+      <span>图标大小</span>
+      <el-slider
+        v-model="setting.softwareSize"
+        :min="30"
+        :max="200"
+        :step="10"
+        :format-tooltip="(num: number) => num + '%'"
+      />
+    </div>
 
     <div class="setting-title">悬浮球</div>
     <div class="setting-row">

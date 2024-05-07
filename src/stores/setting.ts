@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { reactive, toRaw, watch } from "vue";
 import type { ISetting } from "~/types/globalTypes";
+import { debounce } from "@/utils/common"
 
 const useSettingStore = defineStore("globalSetting", () => {
 
@@ -12,6 +13,7 @@ const useSettingStore = defineStore("globalSetting", () => {
 
         isShowSoftwareName: false,
         isShowSoftwareNameTooltip: true,
+        softwareSize: 100,
 
         isBallShow: true,
         isBallAlwaysOnTop: true,
@@ -32,9 +34,11 @@ const useSettingStore = defineStore("globalSetting", () => {
         Object.assign(setting, newValue)
     })
 
-    watch(setting, (newValue) => {
-        window.ipcRenderer.send("set-global-setting", toRaw(newValue))
-    })
+    const saveSetting = debounce(function () {
+        window.ipcRenderer.send("set-global-setting", toRaw(setting))
+    }, 1000)
+
+    watch(setting, saveSetting)
 
     return {
         setting

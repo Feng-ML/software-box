@@ -24,6 +24,7 @@
       v-model="softList"
       item-key="id"
       class="box-content"
+      :style="{ '--software-size': 0.5 * setting.softwareSize + 'px' }"
       :disabled="searchValue"
       :animation="200"
       @start="startSortSoftList"
@@ -334,6 +335,8 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
 
 <style lang="scss" scoped>
 .software-box {
+  --software-size: 50px;
+
   flex: 1;
   margin: 12px 12px 12px 0;
   overflow: hidden;
@@ -344,7 +347,7 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
 
 .box-content {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--software-size), 1fr));
   gap: 20px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -352,22 +355,19 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
 }
 
 // item基础样式
-.card-default {
-  width: 50px;
-  // height: 50px;
+.box-card {
+  width: var(--software-size);
+  height: var(--software-size);
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.box-card {
-  @extend .card-default;
   position: relative;
 
   .el-image {
     cursor: pointer;
+    width: 100%;
     transition: transform 0.3s;
 
     &:hover {
