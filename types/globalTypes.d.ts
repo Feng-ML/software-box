@@ -5,6 +5,7 @@ export declare type ISetting = {
   isShowTrayIcon: boolean,
 
   isShowSoftwareName: boolean,
+  isShowSoftwareNameTooltip: boolean,
 
   isBallShow: boolean,
   isBallAlwaysOnTop: boolean,

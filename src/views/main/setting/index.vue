@@ -31,6 +31,10 @@
       <span>显示软件名称</span>
       <el-switch v-model="setting.isShowSoftwareName" />
     </div>
+    <div class="setting-row">
+      <span>显示软件名称提示</span>
+      <el-switch v-model="setting.isShowSoftwareNameTooltip" />
+    </div>
 
     <div class="setting-title">悬浮球</div>
     <div class="setting-row">

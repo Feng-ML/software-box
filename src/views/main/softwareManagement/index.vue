@@ -24,10 +24,8 @@
       v-model="softList"
       item-key="id"
       class="box-content"
-      :disabled="sortDisable"
+      :disabled="searchValue"
       :animation="200"
-      ghostClass="sortable-ghost"
-      dragClass="sortable-drag"
       @start="startSortSoftList"
       @end="sortSoftList"
     >
@@ -41,7 +39,11 @@
           >
             <RemoveFilled />
           </el-icon>
-          <el-tooltip :content="element.name" placement="top" :disabled="isSorting">
+          <el-tooltip
+            :content="element.name"
+            placement="top"
+            :disabled="isSorting || !setting.isShowSoftwareNameTooltip"
+          >
             <el-image draggable="false" :src="element.icon" @click="openFile(element.path)" />
           </el-tooltip>
           <div v-if="setting.isShowSoftwareName" class="box-name">{{ element.name }}</div>
@@ -176,7 +178,7 @@ const softList = ref<ISoftware[]>([])
 watch(softwareList, () => (softList.value = toRaw(softwareList.value)))
 
 // 图标排序
-const sortDisable = computed(() => !isEdit.value || searchValue.value)
+// const sortDisable = computed(() => !isEdit.value || searchValue.value)
 const isSorting = ref(false)
 const startSortSoftList = () => {
   isSorting.value = true
@@ -395,15 +397,6 @@ window.ipcRenderer.on('context-menu-command', (event: any, command: string) => {
     z-index: 1;
     cursor: pointer;
   }
-}
-
-.sortable-drag {
-  transform: scale(1);
-}
-
-.sortable-ghost {
-  border: 2px dashed var(--el-color-primary);
-  opacity: 0.5;
 }
 
 .flex-center {

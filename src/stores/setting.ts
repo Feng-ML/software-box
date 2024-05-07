@@ -11,6 +11,7 @@ const useSettingStore = defineStore("globalSetting", () => {
         isShowTrayIcon: true,
 
         isShowSoftwareName: false,
+        isShowSoftwareNameTooltip: true,
 
         isBallShow: true,
         isBallAlwaysOnTop: true,
