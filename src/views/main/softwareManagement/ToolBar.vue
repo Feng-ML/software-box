@@ -28,6 +28,7 @@
               :closable="isEdit"
               effect="light"
               size="large"
+              disable-transitions
               @click="activeIndex = index"
               @close="emit('deleteTag', index)"
               @contextmenu="handleContextmenu(index)"
@@ -132,7 +133,7 @@ const handleEditConfirm = () => {
 }
 
 // 排序
-const sortDisable = computed(() => inputVisible.value || editInputValue.value)
+const sortDisable = computed(() => inputVisible.value || editInputValue.value || isDesktop)
 const handleSort = () => {
   emit(
     'sortTag',

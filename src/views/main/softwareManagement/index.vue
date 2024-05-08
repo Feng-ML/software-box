@@ -25,7 +25,7 @@
       item-key="id"
       class="box-content"
       :style="{ '--software-size': 0.5 * setting.softwareSize + 'px' }"
-      :disabled="searchValue"
+      :disabled="sortDisable"
       :animation="200"
       @start="startSortSoftList"
       @end="sortSoftList"
@@ -179,7 +179,7 @@ const softList = ref<ISoftware[]>([])
 watch(softwareList, () => (softList.value = toRaw(softwareList.value)))
 
 // 图标排序
-// const sortDisable = computed(() => !isEdit.value || searchValue.value)
+const sortDisable = computed(() => props.isDesktop || searchValue.value)
 const isSorting = ref(false)
 const startSortSoftList = () => {
   isSorting.value = true
