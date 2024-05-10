@@ -1,17 +1,47 @@
 // @use 'element-plus/theme-chalk/src/index.scss' as *;
 
-:root {
-  --el-color-primary: #406ff3;
-  --el-color-success: #a5dd9b;
-  --el-color-warning: #f6f193;
-  --el-color-danger: #ff7396;
-  --el-color-error: #ff7396;
-  //   --el-text-color-primary: #625442;
+$colorMap: (
+  primary: #406ff3,
+  success: #a5dd9b,
+  warning: #f6f193,
+  danger: #ff7396,
+  error: #f56c6c
+);
+
+$darkColorMap: (
+  primary: #ff9000,
+  success: #b0ffa2,
+  warning: #f6f193,
+  danger: #ff7396,
+  error: #f56c6c
+);
+
+$lightMap: (
+  3: 10%,
+  5: 15%,
+  7: 20%,
+  8: 25%,
+  9: 35%
+);
+
+@mixin set-color-variables($map) {
+  // 设置颜色变量
+  @each $name, $color in $map {
+    --el-color-#{$name}: #{$color};
+
+    // 设置颜色亮色
+    @each $lightName, $light in $lightMap {
+      --el-color-#{$name}-light-#{$lightName}: #{lighten($color, $light)};
+    }
+  }
 }
 
-:root[data-theme='dark'] {
-  --el-bg-color: #000;
+:root {
+  @include set-color-variables($colorMap);
 
-  --el-color-primary: #ff9000;
-  --el-text-color-primary: #fff;
+  &[data-theme='dark'] {
+    @include set-color-variables($darkColorMap);
+    --el-bg-color: #000;
+    --el-text-color-primary: #fff;
+  }
 }

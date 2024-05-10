@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="software-dialog"
-    :style="`background-color: rgba(255, 255, 255, ${setting.dialogTransparency / 100})`"
-  >
+  <div class="software-dialog" :style="`--card-transparency: ${setting.dialogTransparency / 100}`">
     <SoftwareBox isDesktop />
   </div>
 </template>
@@ -16,10 +13,12 @@ const setting = settingStore().setting
 
 <style lang="scss" scoped>
 .software-dialog {
+  --card-transparency: 0.775;
+
   width: 100%;
   height: 100%;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.775);
+  background-color: rgba(255, 255, 255, var(--card-transparency));
 
   .software-box {
     width: 100%;
@@ -31,5 +30,9 @@ const setting = settingStore().setting
     background-color: transparent;
     border: none;
   }
+}
+
+[data-theme='dark'] .software-dialog {
+  background-color: rgba(0, 0, 0, var(--card-transparency)) !important;
 }
 </style>

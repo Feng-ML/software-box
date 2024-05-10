@@ -61,7 +61,7 @@
         </el-icon>
       </div>
       <div v-else class="btns">
-        <el-icon class="main-color" size="20" @click="emit('add')" title="添加">
+        <el-icon class="primary-color" size="20" @click="emit('add')" title="添加">
           <CirclePlusFilled />
         </el-icon>
         <el-icon class="success-color" size="20" title="完成" @click="isEdit = !isEdit">
