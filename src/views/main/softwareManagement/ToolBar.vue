@@ -73,7 +73,6 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, nextTick, ref, toRaw, computed, watch, shallowRef } from 'vue'
 import type { ICategoryItem } from '@/interfaces'
 import { ElInput } from 'element-plus'
 

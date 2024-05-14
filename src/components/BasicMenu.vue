@@ -19,8 +19,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 interface IMenuItem {
   name: string
   icon: string

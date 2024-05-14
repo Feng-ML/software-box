@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
 import WinTitleBar from '@/components/WinTitleBar.vue'
 import Background from '@/components/Background.vue'
 import BasicMenu from '@/components/BasicMenu.vue'

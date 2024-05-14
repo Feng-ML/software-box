@@ -19,6 +19,7 @@ release
 .idea
 .DS_Store
 .vscode
+.nvmrc
 *.suo
 *.ntvs*
 *.njsproj

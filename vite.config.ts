@@ -70,6 +70,7 @@ export default defineConfig(({ command }) => {
         renderer: {},
       }),
       AutoImport({
+        imports: ['vue', 'vue-router'],
         resolvers: [ElementPlusResolver()],
         dts: path.resolve(__dirname, 'types/auto-imports.d.ts'),
       }),

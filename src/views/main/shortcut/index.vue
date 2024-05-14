@@ -21,7 +21,6 @@
 </template>
 
 <script lang="ts" setup>
-import { onUnmounted, reactive, watch, toRaw } from 'vue'
 import type { IShortcut } from '~/types/globalTypes'
 import { CloseBold } from '@element-plus/icons-vue'
 

@@ -8,7 +8,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 
 const emit = defineEmits(['change'])

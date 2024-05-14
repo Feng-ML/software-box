@@ -11,7 +11,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onUnmounted, ref } from 'vue'
 import settingStore from '@/stores/setting'
 import Clock from './clock.vue'
 

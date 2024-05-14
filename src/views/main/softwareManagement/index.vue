@@ -77,7 +77,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watchEffect, reactive, toRaw, provide, shallowRef, watch } from 'vue'
 import { throttle, generateRandomId } from '@/utils/common'
 import { ElMessage } from 'element-plus'
 import settingStore from '@/stores/setting'

@@ -11,9 +11,8 @@
     </div>
   </div>
 </template>
-<script lang="ts" setup>
-import { onMounted } from 'vue'
 
+<script lang="ts" setup>
 // 获取当前时间指针角度
 const now = new Date(),
   hourDeg = (now.getHours() / 12) * 360 + (now.getMinutes() / 60) * 30,
